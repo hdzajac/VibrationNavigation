@@ -4,5 +4,6 @@
 
     <!-- Strings related to MAIN ACTIVITY -->
     <string name="main_button_to_maps">Find Destination</string>
+    <string name="maps_button_search">Go</string>
 
 </resources>
