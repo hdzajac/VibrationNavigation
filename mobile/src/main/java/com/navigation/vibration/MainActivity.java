@@ -35,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void goToMaps(View view){
-        Intent intent = new Intent(MainActivity.this, MapsActivity.class);
+        Intent intent = new Intent(MainActivity.this, PlaceSelectionActivity.class);
         startActivity(intent);
     }
 }

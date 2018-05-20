@@ -1,11 +1,8 @@
 package com.navigation.vibration;
 
-import android.location.Address;
-import android.location.Geocoder;
+import android.content.Intent;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.EditText;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -14,12 +11,15 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.io.IOException;
-import java.util.List;
+import java.io.Serializable;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
+    private LatLng placeLatLng;
+    private String placeAddress;
+    private String placeId;
+    private String placeName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +28,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
+
+        Intent intent = getIntent();
+
+        placeLatLng = intent.getParcelableExtra("place_latlng");
+        placeAddress = (String) intent.getSerializableExtra("place_address");
+        placeId = (String) intent.getSerializableExtra("place_id");
+        placeName = (String) intent.getSerializableExtra("place_name");
+
         mapFragment.getMapAsync(this);
     }
 
@@ -44,31 +52,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
         // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        LatLng placeCoordinates = placeLatLng;
+        mMap.addMarker(new MarkerOptions().position(placeCoordinates).title(placeName));
+        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(placeCoordinates, 12));
     }
 
-    public void search(View view) {
-        EditText locationSearch = findViewById(R.id.maps_search_input);
-        String location = locationSearch.getText().toString();
-        List<Address> addressList = null;
-
-        Geocoder geocoder = new Geocoder(this);
-        try {
-            addressList = geocoder.getFromLocationName(location, 1);
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        assert addressList != null;
-        Address address = addressList.get(0);
-
-        LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-        mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
-        mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
-    }
 }
