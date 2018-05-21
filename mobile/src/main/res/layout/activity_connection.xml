@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<layout xmlns:tools="http://schemas.android.com/tools">
+
+
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp"
+        tools:context=".ConnectionActivity">
+
+        <TextView
+            android:text=""
+            android:id="@+id/textView"
+            android:layout_width="175dp"
+            android:layout_height="62dp"
+            tools:layout_editor_absoluteX="81dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <Button
+            android:id="@+id/conn_left"
+            android:layout_width="171dp"
+            android:layout_height="48dp"
+            android:onClick="connectLeft"
+            android:text="Connect Left "
+            tools:layout_editor_absoluteX="91dp"
+            tools:layout_editor_absoluteY="108dp" />
+
+        <Button
+            android:id="@+id/conn_right"
+            android:layout_width="173dp"
+            android:layout_height="48dp"
+            android:onClick="connectRight"
+            android:text="Connect Right"
+            tools:layout_editor_absoluteX="91dp"
+            tools:layout_editor_absoluteY="194dp" />
+
+        <Button
+            android:id="@+id/next"
+            android:layout_width="171dp"
+            android:layout_height="43dp"
+            android:onClick="goToNextActivity"
+            android:text="Next"
+            tools:layout_editor_absoluteX="91dp"
+            tools:layout_editor_absoluteY="416dp" />
+
+    </LinearLayout>
+</layout>

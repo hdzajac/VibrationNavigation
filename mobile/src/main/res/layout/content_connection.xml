@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ConnectionActivity">
+
+
+    <LinearLayout
+        android:layout_width="311dp"
+        android:layout_height="495dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="8dp">
+
+
+        <TextView
+            android:text="@{MessageToDisplay}"
+            android:id="@+id/textView"
+            android:layout_width="175dp"
+            android:layout_height="62dp"
+            tools:layout_editor_absoluteX="81dp"
+            tools:layout_editor_absoluteY="16dp" />
+
+        <Button
+            android:id="@+id/button6"
+            android:layout_width="171dp"
+            android:layout_height="48dp"
+            android:text="Connect Left "
+            tools:layout_editor_absoluteX="91dp"
+            tools:layout_editor_absoluteY="108dp" />
+
+        <Button
+            android:id="@+id/button7"
+            android:layout_width="173dp"
+            android:layout_height="48dp"
+            android:text="Connect Right"
+            tools:layout_editor_absoluteX="91dp"
+            tools:layout_editor_absoluteY="194dp" />
+
+        <Button
+            android:id="@+id/button9"
+            android:layout_width="171dp"
+            android:layout_height="43dp"
+            android:text="Next"
+            tools:layout_editor_absoluteX="91dp"
+            tools:layout_editor_absoluteY="416dp" />
+
+
+
+    </LinearLayout>
+
+</android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".NoDevicesSelectionActivity">
+
+
+    <LinearLayout
+        android:layout_width="311dp"
+        android:layout_height="495dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteY="8dp">
+
+
+        <TextView
+            android:id="@+id/textView2"
+            android:layout_width="217dp"
+            android:layout_height="64dp"
+            android:text="Select the number of devices you wish to connect "
+            tools:layout_editor_absoluteX="58dp"
+            tools:layout_editor_absoluteY="37dp" />
+
+        <Button
+            android:id="@+id/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="select1"
+            android:text="1"
+            tools:layout_editor_absoluteX="58dp"
+            tools:layout_editor_absoluteY="169dp" />
+
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="select2"
+            android:text="2"
+            tools:layout_editor_absoluteX="187dp"
+            tools:layout_editor_absoluteY="169dp" />
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

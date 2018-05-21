@@ -1,0 +1,91 @@
+
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".PatternSelectionActivity" >
+
+
+    <ListView
+        android:id="@+id/pattern_list"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5" />
+
+
+    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:stretchColumns="1">
+
+        <TableRow>
+
+            <TextView
+                android:padding="3dip"
+                android:text="     " />
+
+            <TextView
+                android:id="@+id/text_up"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text="up" />
+
+            <TextView
+                android:padding="3dip"
+                android:text="     " />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:padding="3dip"
+                android:text="     " />
+
+            <TextView
+                android:id="@+id/text_left"
+                android:gravity="left"
+                android:padding="3dip"
+                android:text="left" />
+
+            <TextView
+                android:id="@+id/text_right"
+                android:gravity="right"
+                android:padding="3dip"
+                android:text="right" />
+        </TableRow>
+
+        <TableRow>
+
+            <TextView
+                android:padding="3dip"
+                android:text="   " />
+
+            <TextView
+                android:id="@+id/text_down"
+                android:gravity="center"
+                android:padding="3dip"
+                android:text="down  " />
+
+            <TextView
+                android:padding="3dip"
+                android:text="   " />
+
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/button9"
+        android:layout_width="171dp"
+        android:layout_height="43dp"
+        android:onClick="goToNextActivity"
+        android:text="Next"
+        tools:layout_editor_absoluteX="91dp"
+        tools:layout_editor_absoluteY="416dp" />
+</LinearLayout>
+
+
+
