@@ -1,8 +1,10 @@
 package com.navigation.vibration;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -37,7 +39,6 @@ public class PatternSelectionActivity extends Activity {
         catch (Exception e)
         { }
 
-
         ArrayAdapter adapter = new ArrayAdapter<String>(this,
                 R.layout.list_activity);
 
@@ -63,14 +64,12 @@ public class PatternSelectionActivity extends Activity {
 
 
     private void vibrationPreview(int position) {
-        VibrationPattern selectedItem = vibrationPatterns.get(position);
+        VibrationPattern selectedPattern= vibrationPatterns.get(position);
+        // actual vibration thingy here....
 
-        TextView up = findViewById(R.id.text_up);
-        TextView down = findViewById(R.id.text_down);
-        TextView left = findViewById(R.id.text_left);
-        TextView right = findViewById(R.id.text_right);
+        Vibrator mVibrator  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        mVibrator.vibrate(selectedPattern.getPatternAhead(), -1);
 
-        // actual vibration thingy here
     }
 
     public void goToNextActivity(View view)
@@ -82,13 +81,40 @@ public class PatternSelectionActivity extends Activity {
     private ArrayList<VibrationPattern>  initList(int noDevices)
     {
         ArrayList<VibrationPattern> list = new ArrayList<>();
+        VibrationPattern pattern1 = new VibrationPattern("LOW_PERIODIC", 1,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC);
+
+        VibrationPattern pattern2 = new VibrationPattern("HIGH_PERIODIC", 1,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC);
+
+        VibrationPattern pattern3 = new VibrationPattern("LONG_CONTINUOUS", 1,
+                PredefinedPatterns.LONG_CONTINUOUS,
+                PredefinedPatterns.LONG_CONTINUOUS,
+                PredefinedPatterns.LONG_CONTINUOUS,
+                PredefinedPatterns.LONG_CONTINUOUS);
+
+        VibrationPattern pattern4 = new VibrationPattern("SHORT_CONTINUOUS", 1,
+                PredefinedPatterns.SHORT_CONTINUOUS,
+                PredefinedPatterns.SHORT_CONTINUOUS,
+                PredefinedPatterns.SHORT_CONTINUOUS,
+                PredefinedPatterns.SHORT_CONTINUOUS);
+
+
         if (noDevices == 1) {
-            list.add(new VibrationPattern("1 -Device1", 1));
-            list.add(new VibrationPattern("1 - Device2", 2));
+            list.add(pattern1);
+            list.add(pattern2);
+            list.add(pattern3);
+            list.add(pattern4);
         }
         else{
-            list.add(new VibrationPattern("2 - Devices1", 1));
-            list.add(new VibrationPattern("2 - Devices2", 2));
+            list.add(pattern1);
+            list.add(pattern2);
       }
         return list;
     }
