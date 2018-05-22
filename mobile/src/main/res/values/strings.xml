@@ -6,7 +6,8 @@
     <string name="main_button_to_maps">Find Destination</string>
     <string name="maps_button_search">Go</string>
     <string name="title_activity_connection">ConnectionActivity</string>
-
+    <string name="start_navi">Start Navigation</string>
+    <string name="stop_navi">Stop Navigation</string>
 
 
 

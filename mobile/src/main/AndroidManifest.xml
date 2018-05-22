@@ -4,6 +4,14 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
@@ -21,7 +29,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"></activity>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -37,7 +44,6 @@
         <activity
             android:name=".MapsActivity"
             android:label="@string/title_activity_maps" />
-        <activity android:name=".PlaceSelectionActivity" />
         <activity
             android:name=".ConnectionActivity"
             android:label="@string/title_activity_connection"
@@ -50,6 +56,37 @@
             </intent-filter>
         </activity>
         <activity android:name=".PatternSelectionActivity"></activity>
+        <!--Developers should put application credentials here.To obtain them, please register the application
+    at https://developer.here.com/develop/mobile-sdks-->
+        <meta-data
+            android:name="com.here.android.maps.appid"
+            android:value="TapAfOvV0R1exwh64DDX" />
+        <meta-data
+            android:name="com.here.android.maps.apptoken"
+            android:value="fC2mTctcAe3nWTp8CjOGfw" />
+        <meta-data
+            android:name="com.here.android.maps.license.key"
+            android:value="DVdoqoXdcZqnsZmTmqWXTtOdJZv4AWnuN//oI2wN1xyXrTJab4z5FYbzjshzOcU+59wh1XH7YkDStTCb3n3lhaAFoewTMr1FURArgYN5zOONFZDDCHBrGYtJhGee8sJxXBij0uPGA5rG/i6jOc43UhGyFWYE7xQ/5AKuh9ddP4QgZJd6E5KQQWa0RAMl9CwJJo+tnwuzmIqWiHMmZEdG0LaQpeoz7StPbD3wLZuvgAO7/RzFKsPyhSAMUTawvkbvP14e0W5dsWcnClCKG13ua4kkeHzaANCInO9Vcnzzm/uKksIqSMj1lSa/nhVgzbUvDJQojTGtPs8cruj/8M+rQ5Hxcuf10aG8CLUarKLs8A3LY3+nz/eYTYoJMwTg99QzkI7gsugE3v2ks+utSEu0BkGioLaRQXGYdJ6DtkiuX6HrmnbiMRVtbnq/5gHcezGrktfR642DK3UZkQF7whkV4rw9910+adF4QAOFexyw0robqTgFTfFVEKSJ6xFu0g8MWXTn4nfPDMpeG+kel8YDObiSvy9LSbZ3vmuTAaClF0Tc8RooQkIZQ6CoIQTK4YRWNoDVSxziGGlUtYmpQzADPVBOFwxMxaGEsTCjzp8dhdg15zqCSfEyY7BtorKXtFZwFKXqsidxAW2ZSJE/IlipcMmKpngxfN/Oj2x5Tl/1B6g=" />
+
+        <!--Developers should always provide custom values for each of {YOUR_LABEL_NAME} and {YOUR_INTENT_NAME}.
+        Do not reuse HERE SDK defaults.-->
+        <!--<meta-data-->
+        <!--android:name="com.navigation.vibration"-->
+        <!--android:value="MapSolutionMapService" />-->
+        <meta-data
+            android:name="INTENT_NAME"
+            android:value="com.vibration.navigation.MapsService" />
+        <service
+            android:name="com.here.android.mpa.service.MapService"
+            android:label="VibrationMapsService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.vibration.navigation.MapsService">
+                </action>
+            </intent-filter>
+        </service>
+
+        <service android:name=".ForegroundService" />
     </application>
 
 </manifest>

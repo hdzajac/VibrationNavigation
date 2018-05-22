@@ -74,7 +74,7 @@ public class PatternSelectionActivity extends Activity {
 
     public void goToNextActivity(View view)
     {
-        Intent intent = new Intent(this, PlaceSelectionActivity.class);
+        Intent intent = new Intent(this, MapsActivity.class);
         startActivity(intent);
     }
 

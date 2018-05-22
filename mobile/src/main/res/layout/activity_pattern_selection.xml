@@ -79,12 +79,12 @@
 
     <Button
         android:id="@+id/button9"
-        android:layout_width="171dp"
-        android:layout_height="43dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:onClick="goToNextActivity"
         android:text="Next"
-        tools:layout_editor_absoluteX="91dp"
-        tools:layout_editor_absoluteY="416dp" />
+        android:layout_gravity="center"
+         />
 </LinearLayout>
 
 
