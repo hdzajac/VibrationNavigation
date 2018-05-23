@@ -37,8 +37,7 @@ public class ConnectionActivity extends AppCompatActivity {
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
         String message = intent.getStringExtra(NoDevicesSelectionActivity.NO_DEVICES);
-        try
-        {
+        try{
             noDevices = Integer.parseInt(message);
             if (noDevices == 1)
                MessageToDisplay = "Select device to connect";
@@ -70,16 +69,14 @@ public class ConnectionActivity extends AppCompatActivity {
         enableNext();
     }
 
-    public void goToNextActivity(View view)
-    {
+    public void goToNextActivity(View view){
         Intent intent = new Intent(this, PatternSelectionActivity.class);
         intent.putExtra(NO_DEVICES, "" + noDevices);
         startActivity(intent);
 
     }
 
-    private void enableNext()
-    {
+    private void enableNext(){
         if (noDevices == 1){
             if  (isLeftConnected || isRightConnected)
                  next.setEnabled(true);
@@ -91,8 +88,7 @@ public class ConnectionActivity extends AppCompatActivity {
             next.setEnabled(true);
     }
     //
-    private void initButtons()
-    {
+    private void initButtons(){
         connLeft =  findViewById(R.id.conn_left);
         connRight = findViewById(R.id.conn_right);
         next = findViewById(R.id.next);
@@ -101,6 +97,26 @@ public class ConnectionActivity extends AppCompatActivity {
         connRight.setBackgroundColor(getResources().getColor(R.color.button_red));
 
         next.setEnabled(false);
+        
+        connLeft.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                \\something something
+            }
+        });
+        
+        connRight.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                \\something something
+            }
+        });
+        
+        next..setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                \\something something
+            }
+        });
     }
-
 }
