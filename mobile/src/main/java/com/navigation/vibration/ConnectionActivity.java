@@ -101,21 +101,26 @@ public class ConnectionActivity extends AppCompatActivity {
         connLeft.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                \\something something
+                //something something
             }
         });
         
         connRight.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                \\something something
+                // TEST BLUETOOTH CONNECITON
+
+
+
+                //something something
             }
         });
         
-        next..setOnClickListener(new View.OnClickListener() {
+        next.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                \\something something
+
+                //something something
             }
         });
     }
