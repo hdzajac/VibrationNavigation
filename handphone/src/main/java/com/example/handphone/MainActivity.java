@@ -194,9 +194,6 @@ public class MainActivity extends AppCompatActivity {
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 String deviceName = device.getName();
                 String deviceHardwareAddress = device.getAddress(); // MAC address
-
-                ConnectThread connectThread = new ConnectThread(device);
-                connectThread.start();
             }
         }
     };

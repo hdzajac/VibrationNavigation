@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.UUID;
@@ -59,6 +60,7 @@ public class BluetoothTest extends Activity {
             mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
+            Log.e(TAG, "In connected constructor");
 
             // Get the input and output streams; using temp objects because
             // member streams are final.
@@ -80,6 +82,7 @@ public class BluetoothTest extends Activity {
         public void run() {
             mmBuffer = new byte[1024];
             int numBytes; // bytes returned from read()
+            Log.e(TAG, "In connected reading");
 
             // Keep listening to the InputStream until an exception occurs.
             while (true) {
@@ -103,13 +106,15 @@ public class BluetoothTest extends Activity {
         // Call this from the main activity to send data to the remote device.
         public void write(byte[] bytes) {
             try {
+                Log.d(TAG, "Input stream writing before");
+
                 mmOutStream.write(bytes);
                 Log.d(TAG, "Input stream writing");
 
                 // Share the sent message with the UI activity.
-                Message writtenMsg = mHandler.obtainMessage(
-                        BluetoothTest.MessageConstants.MESSAGE_WRITE, -1, -1, mmBuffer);
-                writtenMsg.sendToTarget();
+//                Message writtenMsg = mHandler.obtainMessage(
+//                        BluetoothTest.MessageConstants.MESSAGE_WRITE, -1, -1, mmBuffer);
+//                writtenMsg.sendToTarget();
             } catch (IOException e) {
                 Log.e(TAG, "Error occurred when sending data", e);
 
@@ -143,6 +148,8 @@ public class BluetoothTest extends Activity {
             try {
                 // MY_UUID is the app's UUID string, also used by the client code.
                 tmp = bluetoothAdapter.listenUsingRfcommWithServiceRecord(getString(R.string.app_name), MY_UUID);
+                Log.e("Bluetooth", "Created socket");
+
             } catch (IOException e) {
                 Log.e("Bluetooth", "Socket's listen() method failed", e);
             }
@@ -152,32 +159,45 @@ public class BluetoothTest extends Activity {
         public void run() {
             BluetoothSocket socketRight = null;
             BluetoothSocket socketLeft = null;
+            Log.e("Bluetooth", "Running");
 
             // Keep listening until exception occurs or a socket is returned.
             while (true) {
                 try {
                     if(socketRight==null)
-                        socketRight = mmServerSocket.accept();
+                        Log.e("Bluetooth", "Accepting");
+
+                    socketRight = mmServerSocket.accept();
+                    Log.e("Bluetooth", "Accepted");
+
                 } catch (IOException e) {
                     Log.e("Bluetooth", "Socket Right 's accept() method failed", e);
                     break;
                 }
-                try {
-                    if(socketLeft==null)
-                        socketLeft = mmServerSocket.accept();
-                } catch (IOException e) {
-                    Log.e("Bluetooth", "Socket's Left accept() method failed", e);
-                    break;
-                }
+//                try {
+//                    if(socketLeft==null)
+//                        socketLeft = mmServerSocket.accept();
+//                } catch (IOException e) {
+//                    Log.e("Bluetooth", "Socket's Left accept() method failed", e);
+//                    break;
+//                }
 
-                if (socketRight != null && socketRight != null  ) {
+                //&& socketRight != null
+                if (socketRight != null  ) {
                     // A connection was accepted. Perform work associated with
                     // the connection in a separate thread.
                     mConnectedThreadRight = new ConnectedThread(socketRight);
                     mConnectedThreadRight.start();
 
-                    mConnectedThreadLeft = new ConnectedThread(socketLeft);
-                    mConnectedThreadLeft.start();
+                    int a=1;
+                    Log.e("Bluetooth", "Sending");
+
+
+                    mConnectedThreadRight.write(BigInteger.valueOf(1).toByteArray());
+                    Log.e("Bluetooth", "Sent");
+
+                    //mConnectedThreadLeft = new ConnectedThread(socketLeft);
+                    //mConnectedThreadLeft.start();
 
                     try {
                         mmServerSocket.close();
@@ -241,6 +261,7 @@ public class BluetoothTest extends Activity {
         listViewPaired.setAdapter(adapter);
         AcceptThread acceptThread = new AcceptThread();
         acceptThread.start();
+
     }
 
     @Override
@@ -295,6 +316,10 @@ public class BluetoothTest extends Activity {
                 e.printStackTrace();
             }//connect(bdDevice);
             Log.i("Log", "The bond is created: "+isBonded);
+            Log.i("Bluetooth", "Startng socket");
+
+            AcceptThread connectThread = new AcceptThread();
+            connectThread.start();
         }
     }
     class ListItemClickedonPaired implements AdapterView.OnItemClickListener
@@ -318,25 +343,6 @@ public class BluetoothTest extends Activity {
             }
         }
     }
-    /*private void callThread() {
-        new Thread(){
-            public void run() {
-                Boolean isBonded = false;
-                try {
-                    isBonded = createBond(bdDevice);
-                    if(isBonded)
-                    {
-                        arrayListpaired.add(bdDevice.getName()+"\n"+bdDevice.getAddress());
-                        adapter.notifyDataSetChanged();
-                    }
-                } catch (Exception e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }//connect(bdDevice);
-                Log.i("Log", "The bond is created: "+isBonded);
-            }
-        }.start();
-    }*/
     private Boolean connect(BluetoothDevice bdDevice) {
         Boolean bool = false;
         try {
