@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int REQUEST_ENABLE_BT = 1;
     BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     private static final UUID MY_UUID = UUID.fromString("48f3cdb8-6359-11e8-adc0-fa7ae01bbebc");
-    private static final String TAG = "MY_APP_DEBUG_TAG";
+    private static final String TAG = "Client123";
     private Handler mHandler; // handler that gets info from Bluetooth service
     private ListView listViewPaired;
     private ArrayAdapter<String> detectedAdapter;
@@ -154,15 +154,19 @@ public class MainActivity extends AppCompatActivity {
             // Keep listening to the InputStream until an exception occurs.
             while (true) {
                 try {
-                    Log.e(TAG, "Running");
+                    Log.e(TAG, "Running read");
 
                     // Read from the InputStream.
                     numBytes = mmInStream.read(mmBuffer);
                     // Send the obtained bytes to the UI activity.
-                    Message readMsg = mHandler.obtainMessage(
+                    /*Message readMsg = mHandler.obtainMessage(
                             MessageConstants.MESSAGE_READ, numBytes, -1,
                             mmBuffer);
-                    readMsg.sendToTarget();
+                    readMsg.sendToTarget();*/
+
+                    String a = new String(mmBuffer);
+                    Log.e(TAG, "Ran read." + a);
+
                 } catch (IOException e) {
                     Log.d(TAG, "Input stream was disconnected", e);
                     break;
@@ -263,6 +267,7 @@ public class MainActivity extends AppCompatActivity {
                 getPairedDevices();
                 detectedAdapter.notifyDataSetChanged();
                 ConnectThread thread = new ConnectThread(arrayListBluetoothDevices.get(position));
+                thread.start();
             }
         });
 
