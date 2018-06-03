@@ -26,27 +26,39 @@
 
     <Button
         android:id="@+id/conn_left"
-        app:layout_constraintTop_toTopOf="@+id/guideline"
+        app:layout_constraintTop_toBottomOf="@id/guideline"
         android:layout_marginTop="8dp"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
         app:layout_constraintDimensionRatio="10"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:onClick="connectLeft"
-        android:text="Connect Left " />
+        android:text="@string/connect_left" />
 
     <Button
         android:id="@+id/conn_right"
         android:layout_width="200dp"
         android:layout_height="wrap_content"
-        android:onClick="connectRight"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
-        android:text="Connect Right"
-        app:layout_constraintBottom_toTopOf="@+id/guideline"
+        android:text="@string/connect_right"
+        app:layout_constraintBottom_toBottomOf="@id/guideline"
         />
-
+    <Button
+        android:id="@+id/send_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:onClick="sendTestRight"
+        android:text="Send Right"
+        app:layout_constraintTop_toTopOf="parent"/>
+    <Button
+        android:id="@+id/send_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintLeft_toRightOf="@id/send_right"
+        android:onClick="sendTestLeft"
+        android:text="Send Left"
+        />
     <Button
         android:id="@+id/next"
         android:layout_width="match_parent"

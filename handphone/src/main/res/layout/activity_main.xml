@@ -6,10 +6,47 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <ListView
-        android:id="@+id/listBluetooth"
+    <TextView
+        android:id="@+id/status"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:textStyle="bold"
+        android:textSize="30dp"
+        android:textColor="@color/colorNotConnected"
+        android:textAlignment="center"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        android:text="Not connected"
 
-    </ListView>
+        />
+
+    <Button
+        android:id="@+id/connect"
+        android:onClick="connect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/status"
+        android:text="Connect to device"
+        />
+    <Button
+        android:id="@+id/disconnect"
+        android:onClick="disconnect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/connect"
+        android:text="Disconnect"
+        />
+
+
+    <!--<TextView-->
+        <!--android:id="@+id/msg"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:textStyle="bold"-->
+        <!--android:textSize="30dp"-->
+        <!--android:textAlignment="center"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--app:layout_constraintTop_toBottomOf="@id/disconnect"-->
+        <!--android:text="Not connected"-->
+
+        <!--/>-->
+
 </android.support.constraint.ConstraintLayout>

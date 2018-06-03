@@ -52,18 +52,21 @@
             android:label="@string/title_activity_connection"
             android:theme="@style/AppTheme.NoActionBar">
          </activity>
-        <activity android:name=".BluetoothTest">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
+        <!--<activity android:name=".BluetoothTest">-->
+        <!--<intent-filter>-->
+            <!--&lt;!&ndash;<action android:name="android.intent.action.MAIN" />&ndash;&gt;-->
+            <!--&lt;!&ndash;<category android:name="android.intent.category.LAUNCHER" />&ndash;&gt;-->
+        <!--</intent-filter>-->
+        <!--</activity>-->
+        <activity android:name=".DeviceListActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:label="@string/select_device">
         </activity>
         <activity android:name=".NoDevicesSelectionActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
         <activity android:name=".PatternSelectionActivity"></activity>
         <!--Developers should put application credentials here.To obtain them, please register the application

@@ -1,297 +1,269 @@
 package com.example.handphone;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothHeadset;
-import android.bluetooth.BluetoothProfile;
-import android.bluetooth.BluetoothSocket;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import com.example.handphone.models.PredefinedPatterns;
+import com.example.handphone.models.VibrationConstants;
+import com.example.handphone.models.VibrationPattern;
+
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int REQUEST_ENABLE_BT = 1;
-    BluetoothAdapter mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+    public static final int MESSAGE_CONNECTION_FAILED = 1;
+    public static final int MESSAGE_READ = 2;
+    public static final int MESSAGE_WRITE = 3;
+    public static final int MESSAGE_DISCONNECTED = 4;
+    public static final int MESSAGE_TOAST = 5;
+
+    private static final int REQUEST_CONNECT_DEVICE = 1;
+    private static final int REQUEST_ENABLE_BT = 2;
+    private static final String TAG = "Handphone";
     private static final UUID MY_UUID = UUID.fromString("48f3cdb8-6359-11e8-adc0-fa7ae01bbebc");
-    private static final String TAG = "Client123";
-    private Handler mHandler; // handler that gets info from Bluetooth service
-    private ListView listViewPaired;
-    private ArrayAdapter<String> detectedAdapter;
-    private ArrayList<String> arrayListPaired;
-    private AdapterView.OnItemClickListener listItemListener;
-    private ArrayList<BluetoothDevice> arrayListBluetoothDevices;
+
+    private ArrayList<VibrationPattern> vibrationList;
+
+    // Local Bluetooth adapter
+    private BluetoothAdapter mBluetoothAdapter = null;
+
+    private Button connect;
+    private Button disconnect;
+
+    //private Handler mHandler; // handler that gets info from Bluetooth service
+
+    private TextView statusTextView;
+
+    //Testing
+    private static TextView msgTestView;
 
 
-    // Defines several constants used when transmitting messages between the
-    // service and the UI.
-    private interface MessageConstants {
-        public static final int MESSAGE_READ = 0;
-        public static final int MESSAGE_WRITE = 1;
-        public static final int MESSAGE_TOAST = 2;
-
-        // ... (Add other message types here as needed.)
-    }
-
-
-    private class ConnectThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final BluetoothDevice mmDevice;
-
-        public ConnectThread(BluetoothDevice device) {
-            // Use a temporary object that is later assigned to mmSocket
-            // because mmSocket is final.
-            BluetoothSocket tmp = null;
-            mmDevice = device;
-
-            try {
-                // Get a BluetoothSocket to connect with the given BluetoothDevice.
-                // MY_UUID is the app's UUID string, also used in the server code.
-                Log.i("Client123", "Creating socket...");
-                tmp = device.createRfcommSocketToServiceRecord(MY_UUID);
-                Log.i("Client123", "Created.");
-
-            } catch (IOException e) {
-                Log.e("Client123", "Socket's create() method failed", e);
-            }
-            mmSocket = tmp;
-        }
-
-        public void run() {
-            // Cancel discovery because it otherwise slows down the connection.
-            mBluetoothAdapter.cancelDiscovery();
-            Log.i("Client123", "Running...");
-
-            try {
-                // Connect to the remote device through the socket. This call blocks
-                // until it succeeds or throws an exception.
-                Log.i("Client123", "Connecting...");
-
-                mmSocket.connect();
-                Log.i("Client123", "Connected.");
-
-            } catch (IOException connectException) {
-                // Unable to connect; close the socket and return.
-                try {
-                    mmSocket.close();
-                } catch (IOException closeException) {
-                    Log.e("Client123", "Could not close the client123 socket", closeException);
-                }
-                return;
-            }
-
-            // The connection attempt succeeded. Perform work associated with
-            // the connection in a separate thread.
-
-            ConnectedThread mConnectThread = new ConnectedThread(mmSocket);
-            mConnectThread.start();
-
-        }
-
-        // Closes the client123 socket and causes the thread to finish.
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-                Log.e("Client123", "Could not close the client123 socket", e);
-            }
-        }
-    }
-
-    private class ConnectedThread extends Thread {
-        private final BluetoothSocket mmSocket;
-        private final InputStream mmInStream;
-        private final OutputStream mmOutStream;
-        private byte[] mmBuffer; // mmBuffer store for the stream
-
-        public ConnectedThread(BluetoothSocket socket) {
-            mmSocket = socket;
-            InputStream tmpIn = null;
-            OutputStream tmpOut = null;
-
-            // Get the input and output streams; using temp objects because
-            // member streams are final.
-            try {
-                Log.e(TAG, "Constructor");
-
-                tmpIn = socket.getInputStream();
-            } catch (IOException e) {
-                Log.e(TAG, "Error occurred when creating input stream", e);
-            }
-            try {
-                tmpOut = socket.getOutputStream();
-            } catch (IOException e) {
-                Log.e(TAG, "Error occurred when creating output stream", e);
-            }
-
-            mmInStream = tmpIn;
-            mmOutStream = tmpOut;
-        }
-
-        public void run() {
-            mmBuffer = new byte[1024];
-            int numBytes; // bytes returned from read()
-
-            // Keep listening to the InputStream until an exception occurs.
-            while (true) {
-                try {
-                    Log.e(TAG, "Running read");
-
-                    // Read from the InputStream.
-                    numBytes = mmInStream.read(mmBuffer);
-                    // Send the obtained bytes to the UI activity.
-                    /*Message readMsg = mHandler.obtainMessage(
-                            MessageConstants.MESSAGE_READ, numBytes, -1,
-                            mmBuffer);
-                    readMsg.sendToTarget();*/
-
-                    String a = new String(mmBuffer);
-                    Log.e(TAG, "Ran read." + a);
-
-                } catch (IOException e) {
-                    Log.d(TAG, "Input stream was disconnected", e);
-                    break;
-                }
-            }
-        }
-
-        // Call this from the main activity to send data to the remote device.
-        public void write(byte[] bytes) {
-            try {
-                mmOutStream.write(bytes);
-
-                // Share the sent message with the UI activity.
-                Message writtenMsg = mHandler.obtainMessage(
-                        MessageConstants.MESSAGE_WRITE, -1, -1, mmBuffer);
-                writtenMsg.sendToTarget();
-            } catch (IOException e) {
-                Log.e(TAG, "Error occurred when sending data", e);
-
-                // Send a failure message back to the activity.
-                Message writeErrorMsg =
-                        mHandler.obtainMessage(MessageConstants.MESSAGE_TOAST);
-                Bundle bundle = new Bundle();
-                bundle.putString("toast",
-                        "Couldn't send data to the other device");
-                writeErrorMsg.setData(bundle);
-                mHandler.sendMessage(writeErrorMsg);
-            }
-        }
-
-        // Call this method from the main activity to shut down the connection.
-        public void cancel() {
-            try {
-                mmSocket.close();
-            } catch (IOException e) {
-                Log.e(TAG, "Could not close the connect socket", e);
-            }
-        }
-    }
-
-    private TextView mTextView;
-    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                // Discovery has found a device. Get the BluetoothDevice
-                // object and its info from the Intent.
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                getPairedDevices();
-                detectedAdapter.notifyDataSetChanged();
-
-            }
-        }
-    };
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextView = findViewById(R.id.text);
-        listViewPaired = (ListView) findViewById(R.id.listBluetooth);
+        statusTextView = findViewById(R.id.status);
+        //msgTestView = findViewById(R.id.msg);
 
-        if (!mBluetoothAdapter.isEnabled()) {
-            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
+        initList();
+
+        mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+        // If the adapter is null, then Bluetooth is not supported
+        if (mBluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth is not available", Toast.LENGTH_LONG).show();
+            finish();
+            return;
         }
-        Intent discoverableIntent =
-                new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverableIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        startActivity(discoverableIntent);
-
-        Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-
-        arrayListPaired = new ArrayList<String>();
-        detectedAdapter = new ArrayAdapter<String>(MainActivity.this, android.R.layout.simple_list_item_1, arrayListPaired);
-        listViewPaired.setAdapter(detectedAdapter);
-
-        if (pairedDevices.size() > 0) {
-            // There are paired devices. Get the name and address of each paired device.
-            for (BluetoothDevice device : pairedDevices) {
-                String deviceName = device.getName();
-                String deviceHardwareAddress = device.getAddress(); // MAC address
-                arrayListPaired.add(deviceName+deviceHardwareAddress);
-            }
-        }
-        detectedAdapter.notifyDataSetChanged();
-
-        // Register for broadcasts when a device is discovered.
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        registerReceiver(mReceiver, filter);
-        arrayListBluetoothDevices = new ArrayList<BluetoothDevice>();
-        listViewPaired.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Log.i("Client123","Item clicked.");
-                getPairedDevices();
-                detectedAdapter.notifyDataSetChanged();
-                ConnectThread thread = new ConnectThread(arrayListBluetoothDevices.get(position));
-                thread.start();
-            }
-        });
 
 
     }
+
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // Don't forget to unregister the ACTION_FOUND receiver.
-        unregisterReceiver(mReceiver);
+    public void onStart() {
+        Log.v(TAG, "In start");
+        super.onStart();
+        if (!mBluetoothAdapter.isEnabled()) {
+            Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+        } else {
+            setup();
+        }
     }
 
-    private void getPairedDevices() {
-        Set<BluetoothDevice> pairedDevice = mBluetoothAdapter.getBondedDevices();
-        arrayListPaired.clear();
-        arrayListBluetoothDevices.clear();
-        if(pairedDevice.size()>0)
-        {
-            for(BluetoothDevice device : pairedDevice)
-            {
-                arrayListPaired.add(device.getName()+"\n"+device.getAddress());
-                arrayListBluetoothDevices.add(device);
+    private void setup() {
+        //Make sure device is discoverable
+        //ensureDiscoverable();
+        if (BluetoothService.getInstance() != null) {
+            BluetoothService.getInstance();
+
+        }
+        // Initialize the BluetoothChatService to perform bluetooth connections
+        BluetoothService.getInstance().setAppName(getResources().getString(R.string.app_name));
+        // set up handler here
+        BluetoothService.getInstance().setHandler(mHandler);
+    }
+
+    @Override
+    public synchronized void onPause() {
+        super.onPause();
+
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+
+    }
+
+    @Override
+    public synchronized void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Stop the Bluetooth services
+        //if (BluetoothService.getInstance() != null) BluetoothService.getInstance().stop();
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.v(TAG,"On activity result");
+        switch (requestCode) {
+            case REQUEST_CONNECT_DEVICE:
+                // When DeviceListActivity returns with a device to connect
+                if (resultCode == Activity.RESULT_OK) {
+                    Log.v(TAG, "In connecting activity.");
+                    // Get the device MAC address
+                    String address = data.getExtras().getString(DeviceListActivity.EXTRA_DEVICE_ADDRESS);
+                    // Get the BLuetoothDevice object
+                    BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+                    // Attempt to connect to the device
+                    Log.v(TAG, "Going to service to connect device " + address.toString());
+                    BluetoothService.getInstance().connect(device);
+
+                    //todo should do properly with handler
+                    statusTextView.setText(getString(R.string.connected));
+                    statusTextView.setTextColor(getResources().getColor(R.color.colorConnected));
+                }
+                break;
+            case REQUEST_ENABLE_BT:
+                // When the request to enable Bluetooth returns
+                Log.v(TAG, "Requested enabling bluetooth");
+                if (resultCode == Activity.RESULT_OK) {
+                    // Bluetooth is now enabled, so set up a chat session
+                    setup();
+                } else {
+                    // User did not enable Bluetooth or an error occured
+                    Log.e(TAG, "Bluetooth Not enabled");
+                    Toast.makeText(this, "Bluetooth not enabled.", Toast.LENGTH_SHORT).show();
+                    finish();
+                }
+        }
+    }
+
+    public void connect(View view) {
+        Intent serverIntent = new Intent(this, DeviceListActivity.class);
+        startActivityForResult(serverIntent, REQUEST_CONNECT_DEVICE);
+    }
+
+    public void disconnect(View view) {
+        BluetoothService.getInstance().disconnect();
+    }
+
+    // The Handler that gets information back from the BluetoothChatService
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
+                case MESSAGE_READ:
+                    byte[] readBuf = (byte[]) msg.obj;
+                    // construct a string from the valid bytes in the buffer
+
+                    //test code
+                    //String readMessage = new String(readBuf, 0, msg.arg1);
+
+                    //msgTestView.setText(readMessage);
+                    String readMessage = new String(readBuf, 0, msg.arg1);
+                    Log.v(TAG,"Received "+readMessage);
+
+                    byte vibrationID;
+                    if(readBuf.length>=1) {
+                        //todo some validation for trash
+                        vibrationID=readBuf[0];
+                        VibrationPattern selectedPattern = vibrationList.get(vibrationID-1);
+
+                        Vibrator mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+                        mVibrator.vibrate(selectedPattern.getPatternAhead(), -1);
+                    }
+                    break;
+                case MESSAGE_DISCONNECTED:
+                    statusTextView.setText(getString(R.string.disconnected));
+                    statusTextView.setTextColor(getResources().getColor(R.color.colorNotConnected));
+                    Toast.makeText(getApplicationContext(), "Connection lost. ", Toast.LENGTH_SHORT).show();
+
+                    break;
+                case MESSAGE_CONNECTION_FAILED:
+                    statusTextView.setText(getString(R.string.disconnected));
+                    statusTextView.setTextColor(getResources().getColor(R.color.colorNotConnected));
+
+                    Toast.makeText(getApplicationContext(), "Connection failed. ", Toast.LENGTH_SHORT).show();
+                    break;
             }
         }
-        detectedAdapter.notifyDataSetChanged();
+    };
+
+    private void initList() {
+        //todo
+        //will identify patterns by id uniquely send the id to bluetooth device together with LEFT RIGHT AHEAD ETC;
+
+        vibrationList = new ArrayList<>();
+
+        // Patters for 1 device
+                VibrationPattern pattern1 = new VibrationPattern("LOW_PERIODIC", VibrationConstants.LONG_PERIODIC_1,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC);
+
+        VibrationPattern pattern2 = new VibrationPattern("HIGH_PERIODIC", VibrationConstants.HIGH_PERIODIC_1,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC);
+
+        VibrationPattern pattern3 = new VibrationPattern("LONG_CONTINUOUS", VibrationConstants.LONG_CONTINUOUS_2,
+                PredefinedPatterns.LONG_CONTINUOUS,
+                PredefinedPatterns.LONG_CONTINUOUS,
+                PredefinedPatterns.LONG_CONTINUOUS,
+                PredefinedPatterns.LONG_CONTINUOUS);
+
+        VibrationPattern pattern4 = new VibrationPattern("SHORT_CONTINUOUS", VibrationConstants.SHORT_CONTINUOUS_2,
+                PredefinedPatterns.SHORT_CONTINUOUS,
+                PredefinedPatterns.SHORT_CONTINUOUS,
+                PredefinedPatterns.SHORT_CONTINUOUS,
+                PredefinedPatterns.SHORT_CONTINUOUS);
+
+        //Patterns for 2 devices
+        VibrationPattern pattern1_2 = new VibrationPattern("LOW_PERIODIC", VibrationConstants.LONG_PERIODIC_2,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC,
+                PredefinedPatterns.LOW_PERIODIC);
+
+        VibrationPattern pattern2_2 = new VibrationPattern("HIGH_PERIODIC", VibrationConstants.HIGH_PERIODIC_2,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC,
+                PredefinedPatterns.HIGH_PERIODIC);
+
+        //Adding them according to index to et them by id directly
+        vibrationList.add(pattern1);
+        vibrationList.add(pattern2);
+        vibrationList.add(pattern3);
+        vibrationList.add(pattern4);
+        vibrationList.add(pattern1_2);
+        vibrationList.add(pattern2_2);
+
     }
 }

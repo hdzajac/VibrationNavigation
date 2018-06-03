@@ -1,4 +1,4 @@
-package com.navigation.vibration;
+package com.example.handphone.models;
 
 public class PredefinedPatterns {
 
