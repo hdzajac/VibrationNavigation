@@ -13,7 +13,10 @@ public class VibrationConstants {
     public static final byte LEFT = 1;
     public static final byte RIGHT = 2;
     public static final byte AHEAD =3;
-    public static final byte BACK =3;
+    public static final byte BACK =4;
+
+    //
+
 
     public static long[] getVibrationType(int id)
     {

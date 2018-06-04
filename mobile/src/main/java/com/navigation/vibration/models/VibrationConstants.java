@@ -11,10 +11,10 @@ public class VibrationConstants {
     public static final byte LOW_PERIODIC_TAG= 4;
 
     //Position constants
-    public static final byte LEFT  = 1;
+    public static final byte LEFT = 1;
     public static final byte RIGHT = 2;
-    public static final byte AHEAD = 3;
-    public static final byte BACK  = 4;
+    public static final byte AHEAD =3;
+    public static final byte BACK =4;
 
     public static final String POSITION = "position";
 
@@ -76,6 +76,16 @@ public class VibrationConstants {
          }
     }
 
-
+    public static byte pickVibrationTag(long[] pattern){
+        if(pattern == PredefinedPatterns.HIGH_PERIODIC)
+            return HIGH_PERIODIC_TAG;
+        else if (pattern == PredefinedPatterns.LOW_PERIODIC)
+            return LOW_PERIODIC_TAG;
+        else if (pattern == PredefinedPatterns.LONG_CONTINUOUS)
+            return LONG_CONTINUOUS_TAG;
+        else if (pattern == PredefinedPatterns.SHORT_CONTINUOUS)
+            return SHORT_CONTINUOUS_TAG;
+        return -1;
+    }
 
 }

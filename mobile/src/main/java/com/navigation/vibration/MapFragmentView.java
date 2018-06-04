@@ -26,15 +26,20 @@ import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
 import com.here.android.positioning.StatusListener;
+import com.navigation.vibration.models.VibrationConstants;
+import com.navigation.vibration.models.VibrationPattern;
+import com.navigation.vibration.service.BluetoothService;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -65,17 +70,25 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
     private boolean mTransforming;
     private PositioningManager mPositioningManager;
 
+    private String TAG = "MapFragment";
     // callback that is called when transforming ends
     private Runnable mPendingUpdate;
 
     // text view instance for showing location information
     private TextView mLocationInfo;
-    private Maneuver m_currentManeuver=null;
+    private Maneuver m_currentManeuver = null;
 
-    public MapFragmentView(MapsActivity activity) {
+    private int noDevices;
+    VibrationPattern chosenVibrationPattern;
+
+
+    public MapFragmentView(MapsActivity activity, int vibrationId, int devices) {
         m_activity = activity;
+        noDevices=devices;
+        chosenVibrationPattern = VibrationConstants.getVibrationPattern(vibrationId);
         initMapFragment();
         initNaviControlButton();
+
     }
     // Resume positioning listener on wake up
 
@@ -170,9 +183,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         routePlan.setRouteOptions(routeOptions);
 
         /* Define waypoints for the route */
-        /* START: 4350 Still Creek Dr */
         RouteWaypoint startPoint = new RouteWaypoint(m_current_location);
-        /* END: Langley BC */
         RouteWaypoint destination = new RouteWaypoint(new GeoCoordinate(destinationLitLng.latitude, destinationLitLng.longitude));
 
         /* Add both waypoints to the route plan */
@@ -205,7 +216,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                                 /* Add the MapRoute to the map */
                                 m_map.addMapObject(mapRoute);
 
-                                m_currentManeuver=m_route.getFirstManeuver();
+                                m_currentManeuver = m_route.getFirstManeuver();
                                 /*
                                  * We may also want to make sure the map view is orientated properly
                                  * so the entire route can be easily seen.
@@ -262,13 +273,6 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         });
     }
 
-    /*
-     * Android 8.0 (API level 26) limits how frequently background apps can retrieve the user's
-     * current location. Apps can receive location updates only a few times each hour.
-     * See href="https://developer.android.com/about/versions/oreo/background-location-limits.html
-     * In order to retrieve location updates more frequently start a foreground service.
-     * See https://developer.android.com/guide/components/services.html#Foreground
-     */
     private void startForegroundService() {
         if (!m_foregroundServiceStarted) {
             m_foregroundServiceStarted = true;
@@ -372,34 +376,64 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         public void onNewInstructionEvent() {
             super.onNewInstructionEvent();
             Maneuver maneuver = m_navigationManager.getNextManeuver();
+            int turn=-1;
             if (maneuver != null) {
                 if (maneuver.getAction() == Maneuver.Action.END) {
                     //notify the user that the route is complete
                 }
-                switch (m_currentManeuver.getTurn()){
-                    case QUITE_RIGHT:
-                        Toast.makeText(m_activity, "QUITE_RIGHT", Toast.LENGTH_SHORT).show();
+                switch (m_currentManeuver.getTurn()) {
+                    case QUITE_RIGHT: //A turn that indicates making a normal right turn.
+                        turn = VibrationConstants.RIGHT;
+                        Log.v(TAG, "QUITE_RIGHT");
                         break;
-                    case LIGHT_RIGHT:
-                        Toast.makeText(m_activity, "LIGHT_RIGHT", Toast.LENGTH_SHORT).show();
+                    case LIGHT_RIGHT: //A turn that indicates making a light right turn.
+                        turn = VibrationConstants.RIGHT;
+                        Log.v(TAG, "LIGHT_RIGHT");
                         break;
-                    case KEEP_RIGHT:
-                        Toast.makeText(m_activity, "KEEP_RIGHT", Toast.LENGTH_SHORT).show();
+                    case KEEP_RIGHT: //A turn that indicates keeping to the right when a road forks.
+                        turn = VibrationConstants.RIGHT;
+                        Log.v(TAG, "KEEP_RIGHT");
                         break;
-                    case QUITE_LEFT:
-                        Toast.makeText(m_activity, "QUITE_LEFT", Toast.LENGTH_SHORT).show();
+                    case HEAVY_RIGHT: //A turn that indicates making a heavy right turn.
+                        Log.v(TAG, "HEAVY_RIGHT");
+                        turn = VibrationConstants.RIGHT;
                         break;
-                    case LIGHT_LEFT:
-                        Toast.makeText(m_activity, "LIGHT_LEFT", Toast.LENGTH_SHORT).show();
+                    case QUITE_LEFT: //A turn that indicates making a normal left turn.
+                        Log.v(TAG, "QUITE_LEFT");
+                        turn = VibrationConstants.LEFT;
                         break;
-                    case KEEP_LEFT:
-                        Toast.makeText(m_activity, "KEEP_LEFT", Toast.LENGTH_SHORT).show();
+                    case LIGHT_LEFT: //A turn that indicates making a light left turn.
+                        Log.v(TAG, "LIGHT_LEFT");
+                        turn = VibrationConstants.LEFT;
+                        break;
+                    case KEEP_LEFT: //A turn that indicates keeping to the left when a road forks.
+                        Log.v(TAG, "KEEP_LEFT");
+                        turn = VibrationConstants.LEFT;
+                        break;
+                    case HEAVY_LEFT: //A turn that indicates making a heavy left turn.
+                        Log.v(TAG, "HEAVY_LEFT");
+                        turn = VibrationConstants.LEFT;
+                        break;
+                    case RETURN: //A turn that indicates turning around or making a U-turn.
+                        Log.v(TAG, "RETURN");
+                        turn = VibrationConstants.BACK;
+                        break;
+                    case KEEP_MIDDLE: //A turn that indicates keeping to the middle when a road forks.
+                        Log.v(TAG, "KEEP_MIDDLE");
+                        turn = VibrationConstants.AHEAD;
+                        break;
+                    case NO_TURN: //Indicates that no turn is necessary.
+                        Log.v(TAG, "NO_TURN");
+                        turn = VibrationConstants.AHEAD;
                         break;
                     default:
-                        System.out.println(maneuver.getTurn());
+                        Log.v(TAG,maneuver.getTurn().toString());
                         break;
                 }
-                m_currentManeuver=maneuver;
+
+                vibrate(turn);
+
+                m_currentManeuver = maneuver;
                 //TRAFFIC DIRECTION IS NOT TURN
                 //if (maneuver.getTrafficDirection() == Maneuver.TrafficDirection.LEFT)
                 //    Toast.makeText(m_activity, "LEFT", Toast.LENGTH_SHORT).show();
@@ -492,5 +526,65 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
             mPendingUpdate = null;
         }
     }
+
+    //BACK and ahead always sent to both devices
+    private void vibrate(int position) {
+        byte tag=0;
+        byte[] msg = new byte[1];
+
+        switch (position) {
+            case VibrationConstants.AHEAD: //-1 means repeats once
+                tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternAhead());
+                msg[0]=tag;
+
+                if(noDevices==1){
+                    Log.v(TAG,"Sending to right vibration ahead");
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                } else {
+                    Log.v(TAG,"Sending to both vibration ahead");
+                    BluetoothService.getInstance().write(VibrationConstants.LEFT,msg);
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                }
+                break;
+            case VibrationConstants.RIGHT:
+                tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternRight());
+
+                msg[0]=tag;
+                Log.v(TAG,"Sending to right vibration right");
+                //do not check for number of devices since default is right
+                BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+
+                break;
+            case VibrationConstants.LEFT:
+                tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternLeft());
+                msg[0]=tag;
+
+                if(noDevices==1){
+                    Log.v(TAG,"Sending to right vibration left");
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                } else {
+                    Log.v(TAG,"Sending to left vibration left");
+                    BluetoothService.getInstance().write(VibrationConstants.LEFT,msg);
+                }
+                break;
+            case VibrationConstants.BACK:
+                tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternBack());
+                msg[0]=tag;
+
+                if(noDevices==1){
+                    Log.v(TAG,"Sending to right vibration back");
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                } else {
+                    Log.v(TAG,"Sending to both vibration back");
+                    BluetoothService.getInstance().write(VibrationConstants.LEFT,msg);
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                }
+                break;
+            default:
+                Log.e(TAG, "Bad turn value " + tag);
+                break;
+        }
+    }
+
 
 }

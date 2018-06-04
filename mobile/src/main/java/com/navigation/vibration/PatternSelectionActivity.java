@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Handler;
 import android.os.Vibrator;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,43 +23,31 @@ public class PatternSelectionActivity extends Activity {
 
     public static final String VIBRATION_POSITION = "chosen_vibration";
     private ArrayList<VibrationPattern> vibrationPatterns;
-    private TextView aheadText;
-    private TextView backText;
+    private int noDevices = 1;
+
     private Vibrator mVibrator;
 
     //choose vibrations by list position
-    private int chosenVibrationID =1;
+    private int chosenVibrationID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pattern_selection);
-        aheadText = findViewById(R.id.text_up);
-        backText = findViewById(R.id.text_back);
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
         String message = intent.getStringExtra(NoDevicesSelectionActivity.NO_DEVICES);
-
-        int noDevices = 2;
         try {
             noDevices = Integer.parseInt(message);
+        } catch (Exception e) {
+            Log.e("PatternSelection", "Bad number of devices");
         }
-        catch (Exception e)
-        { }
-
-        ArrayAdapter adapter = new ArrayAdapter<String>(this,
-                R.layout.list_activity);
 
         ListView listView =  findViewById(R.id.pattern_list);
-        listView.setAdapter(adapter);
-
-
         vibrationPatterns = initList(noDevices);
-        adapter   = new VibrationPatternAdaptor(this, vibrationPatterns);
-
-        listView =findViewById(R.id.pattern_list);
+        VibrationPatternAdaptor adapter   = new VibrationPatternAdaptor(this, vibrationPatterns);
         listView.setAdapter(adapter);
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -71,12 +60,6 @@ public class PatternSelectionActivity extends Activity {
 
     }
 
-    void previewPatternAhead()
-    {
-       // mVibrator.vibrate(selectedPattern.getPatternAhead(), 0);
-    }
-
-
 
     private void vibrationPreview(int position) {
         final VibrationPattern  selectedPattern = vibrationPatterns.get(position);
@@ -85,11 +68,9 @@ public class PatternSelectionActivity extends Activity {
 
         // actual vibration thingy here....
 
+        Vibrator mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
          mVibrator  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-
-       patternPreview(aheadText,selectedPattern.getPatternAhead());
-       patternPreview(backText ,selectedPattern.getPatternBack());
 
     }
 
@@ -105,10 +86,10 @@ public class PatternSelectionActivity extends Activity {
     }
 
 
-    public void goToNextActivity(View view)
-    {
+    public void goToNextActivity(View view) {
         Intent intent = new Intent(this, MapsActivity.class);
         intent.putExtra(VIBRATION_POSITION, chosenVibrationID);
+        intent.putExtra(NoDevicesSelectionActivity.NO_DEVICES,noDevices);
         startActivity(intent);
     }
 
