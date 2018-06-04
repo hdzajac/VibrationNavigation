@@ -21,10 +21,13 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.navigation.vibration.models.VibrationConstants;
+import com.navigation.vibration.models.VibrationPattern;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 
 public class MapsActivity extends AppCompatActivity {
@@ -32,11 +35,29 @@ public class MapsActivity extends AppCompatActivity {
     private final static int REQUEST_CODE_ASK_PERMISSIONS = 1;
     private MapFragmentView m_mapFragmentView;
     private PlaceAutocompleteFragment m_autocompleteFragment;
+    private static final String TAG = "MapsActivity";
+    private int noDevices;
 
+    private int chosenVibrationId ;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
+        Intent intent = getIntent();
+        chosenVibrationId = intent.getIntExtra(PatternSelectionActivity.VIBRATION_POSITION,-1);
+        Log.v(TAG,"Id of vibration pattern " + chosenVibrationId);
+
+        if(chosenVibrationId==-1) {
+            //move to default id if it fails to receive from intent
+            chosenVibrationId=VibrationConstants.ONE_DEVICE_1;
+            Toast.makeText(this, "Could not get vibration", Toast.LENGTH_SHORT);
+            Log.e(TAG,"Could not get vibration");
+        }
+
+        noDevices = intent.getIntExtra(NoDevicesSelectionActivity.NO_DEVICES,1);
+        Log.v(TAG,"No devices " + noDevices);
+
         requestPermissions();
     }
 
@@ -89,7 +110,7 @@ public class MapsActivity extends AppCompatActivity {
                  * All permission requests are being handled.Create map fragment view.Please note
                  * the HERE SDK requires all permissions defined above to operate properly.
                  */
-                m_mapFragmentView = new MapFragmentView(this);
+                m_mapFragmentView = new MapFragmentView(this, chosenVibrationId,noDevices);
 
                 m_autocompleteFragment = (PlaceAutocompleteFragment)getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
                 m_autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {

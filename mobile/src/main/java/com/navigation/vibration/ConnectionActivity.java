@@ -261,6 +261,7 @@ public class ConnectionActivity extends AppCompatActivity {
                         disconnectedLeft();
                         disconnectedRight();
                     }
+                    //todo check if this is displayed inmap fragment
                     Toast.makeText(getApplicationContext(), "Connection lost.", Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -271,28 +272,14 @@ public class ConnectionActivity extends AppCompatActivity {
 
     public void sendTestRight(View view) {
         Log.v(TAG,"Sending to slaves");
-        // Check that we're actually connected before trying anything
-        // if (BluetoothService.getInstance().getState() != BluetoothService.getInstance().STATE_CONNECTED) {
-        //     Toast.makeText(this, "Not connected", Toast.LENGTH_SHORT).show();
-        //     return;
-        // }
-        // Check that there's actually something to send
-
-        // Get the message bytes and tell the BluetoothChatService to write
-//        String messageRight = "hello right";
-//        String messageLeft = "hello left";
-//        byte[] sendRight = messageRight.getBytes();
-//        byte[] sendLeft = messageLeft.getBytes();
-
-        byte[] sendRight = new byte[]{VibrationConstants.LONG_CONTINUOUS_2};
-
+        byte[] sendRight = new byte[]{VibrationConstants.SHORT_CONTINUOUS_TAG};
         Log.v(TAG,"Sending to right");
         BluetoothService.getInstance().write(VibrationConstants.RIGHT,sendRight);
 
     }
 
     public void sendTestLeft(View view) {
-        byte[] sendLeft= new byte[]{VibrationConstants.SHORT_CONTINUOUS_2};
+        byte[] sendLeft= new byte[]{VibrationConstants.SHORT_CONTINUOUS_TAG};
         Log.v(TAG,"Sending to left");
         BluetoothService.getInstance().write( VibrationConstants.LEFT,sendLeft);
 
