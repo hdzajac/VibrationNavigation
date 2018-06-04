@@ -73,7 +73,7 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
         MODE = position;
 
         if(MOTORS == 2)
-            pattern = VibrationConstants.getVibrationPattern(position);
+            pattern = VibrationConstants.getVibrationPattern(position + 1);
         else
             pattern = VibrationConstants.getVibrationPattern(position + 4);
 
@@ -105,7 +105,7 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateRight(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern.getPatternAhead(),-1));
+        vibrator.vibrate(VibrationEffect.createWaveform(pattern.getPatternRight(),-1));
     }
 
 }
