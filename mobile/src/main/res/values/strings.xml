@@ -32,5 +32,17 @@
     <string name="connect_one">Connecting ...</string>
     <string name="connected_one">Connected</string>
 
+    <string-array name="pattern_selection_spinner_list_2">
+        <item>High Frequency</item>
+        <item>Low Frequency</item>
+        <item>Long Continuous</item>
+        <item>Short Continuous</item>
+    </string-array>
+
+    <string-array name="pattern_selection_spinner_list_1">
+        <item>High Frequency</item>
+        <item>Low Frequency</item>
+    </string-array>
+
 
 </resources>
