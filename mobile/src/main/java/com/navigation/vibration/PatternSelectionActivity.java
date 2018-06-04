@@ -17,19 +17,14 @@ import android.widget.Spinner;
 import com.navigation.vibration.models.VibrationConstants;
 import com.navigation.vibration.models.VibrationPattern;
 
-import java.util.ArrayList;
-
 public class PatternSelectionActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     public static final String VIBRATION_POSITION = "chosen_vibration";
     private static int MOTORS = 2;
-    private static int MODE = 2;
-    private static VibrationPattern pattern;
+    private static VibrationPattern vibrationPattern;
+    private static int vibrationPatternId;
     private static final String TAG = "PatternSelection";
     private static Vibrator vibrator;
-
-    //choose vibrations by list position
-    private int chosenVibrationID = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,20 +58,23 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
 
     public void goToNextActivity(View view) {
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra(VIBRATION_POSITION, chosenVibrationID);
+        intent.putExtra(VIBRATION_POSITION, vibrationPatternId);
+        intent.putExtra(NoDevicesSelectionActivity.NO_DEVICES,MOTORS);
         startActivity(intent);
     }
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.i(TAG, "selected pattern: " + parent.getItemAtPosition(position));
-        MODE = position;
+        Log.i(TAG, "selected vibrationPattern: " + parent.getItemAtPosition(position));
 
-        if(MOTORS == 2)
-            pattern = VibrationConstants.getVibrationPattern(position + 1);
-        else
-            pattern = VibrationConstants.getVibrationPattern(position + 4);
-
+        if(MOTORS == 2) {
+            vibrationPattern = VibrationConstants.getVibrationPattern(position + 1);
+            vibrationPatternId = position + 1;
+        }
+        else {
+            vibrationPattern = VibrationConstants.getVibrationPattern(position + 4);
+            vibrationPatternId = position + 4;
+        }
         View gridView = findViewById(R.id.pattern_selection_grid_layout);
         if (gridView.getVisibility() != View.VISIBLE)
             gridView.setVisibility(View.VISIBLE);
@@ -90,22 +88,22 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateTop(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern.getPatternAhead(),-1));
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternAhead(),-1));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateBottom(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern.getPatternBack(),-1));
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternBack(),-1));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateLeft(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern.getPatternLeft(),-1));
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternLeft(),-1));
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateRight(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(pattern.getPatternRight(),-1));
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternRight(),-1));
     }
 
 }
