@@ -216,7 +216,7 @@ public class ConnectionActivity extends AppCompatActivity {
 
     public void goToNextActivity(View view) {
         Intent intent = new Intent(this, PatternSelectionActivity.class);
-        intent.putExtra(NO_DEVICES, "" + noDevices);
+        intent.putExtra(NO_DEVICES, noDevices);
         startActivity(intent);
 
     }
