@@ -3,12 +3,14 @@ package com.navigation.vibration;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Handler;
 import android.os.Vibrator;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.navigation.vibration.adaptors.VibrationPatternAdaptor;
 import com.navigation.vibration.models.VibrationConstants;
@@ -20,6 +22,9 @@ public class PatternSelectionActivity extends Activity {
 
     public static final String VIBRATION_POSITION = "chosen_vibration";
     private ArrayList<VibrationPattern> vibrationPatterns;
+    private TextView aheadText;
+    private TextView backText;
+    private Vibrator mVibrator;
 
     //choose vibrations by list position
     private int chosenVibrationID =1;
@@ -29,11 +34,13 @@ public class PatternSelectionActivity extends Activity {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pattern_selection);
-
+        aheadText = findViewById(R.id.text_up);
+        backText = findViewById(R.id.text_back);
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
         String message = intent.getStringExtra(NoDevicesSelectionActivity.NO_DEVICES);
+
         int noDevices = 2;
         try {
             noDevices = Integer.parseInt(message);
@@ -64,18 +71,39 @@ public class PatternSelectionActivity extends Activity {
 
     }
 
+    void previewPatternAhead()
+    {
+       // mVibrator.vibrate(selectedPattern.getPatternAhead(), 0);
+    }
+
+
 
     private void vibrationPreview(int position) {
-        VibrationPattern selectedPattern = vibrationPatterns.get(position);
+        final VibrationPattern  selectedPattern = vibrationPatterns.get(position);
+        Handler handler = new Handler();
         chosenVibrationID = selectedPattern.getId();
 
         // actual vibration thingy here....
 
-        Vibrator mVibrator  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+         mVibrator  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
-        mVibrator.vibrate(selectedPattern.getPatternAhead(), -1);
+
+       patternPreview(aheadText,selectedPattern.getPatternAhead());
+       patternPreview(backText ,selectedPattern.getPatternBack());
 
     }
+
+    private void patternPreview(TextView ui, long[] pattern)
+    {
+        ui.setBackgroundColor(getResources().getColor(R.color.button_green));
+        mVibrator.vibrate(pattern, -1);
+        try {
+            Thread.sleep(3000);
+        } catch (Exception e) {}
+        mVibrator.cancel();
+        ui.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
+    }
+
 
     public void goToNextActivity(View view)
     {
@@ -84,60 +112,19 @@ public class PatternSelectionActivity extends Activity {
         startActivity(intent);
     }
 
+    // the list of possible patterns depending on the number of devices
     private ArrayList<VibrationPattern>  initList(int noDevices)
     {
-        //todo
-        //will identify patterns by id uniquely send the id to bluetooth device together with LEFT RIGHT AHEAD ETC
-
         ArrayList<VibrationPattern> list = new ArrayList<>();
 
-        // Patters for 1 device
-        VibrationPattern pattern1 = new VibrationPattern("LOW_PERIODIC", VibrationConstants.LONG_PERIODIC_1,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC);
-
-        VibrationPattern pattern2 = new VibrationPattern("HIGH_PERIODIC", VibrationConstants.HIGH_PERIODIC_1,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC);
-
-            VibrationPattern pattern3 = new VibrationPattern("LONG_CONTINUOUS",  VibrationConstants.LONG_CONTINUOUS_2,
-                PredefinedPatterns.LONG_CONTINUOUS,
-                PredefinedPatterns.LONG_CONTINUOUS,
-                PredefinedPatterns.LONG_CONTINUOUS,
-                PredefinedPatterns.LONG_CONTINUOUS);
-
-        VibrationPattern pattern4 = new VibrationPattern("SHORT_CONTINUOUS",  VibrationConstants.SHORT_CONTINUOUS_2,
-                PredefinedPatterns.SHORT_CONTINUOUS,
-                PredefinedPatterns.SHORT_CONTINUOUS,
-                PredefinedPatterns.SHORT_CONTINUOUS,
-                PredefinedPatterns.SHORT_CONTINUOUS);
-
-        //Patterns for 2 devices
-        VibrationPattern pattern1_2 = new VibrationPattern("LOW_PERIODIC", VibrationConstants.LONG_PERIODIC_2,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC);
-
-        VibrationPattern pattern2_2 = new VibrationPattern("HIGH_PERIODIC", VibrationConstants.HIGH_PERIODIC_2,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC);
-
         if (noDevices == 1) {
-            list.add(pattern1);
-            list.add(pattern2);
-            list.add(pattern3);
-            list.add(pattern4);
+            list.add(VibrationConstants.OneDevice1);
+            list.add(VibrationConstants.OneDevice2);
         }
         else{
-            list.add(pattern1_2);
-            list.add(pattern2_2);
+            list.add(VibrationConstants.TwoDevices1);
+            list.add(VibrationConstants.TwoDevices2);
+            list.add(VibrationConstants.TwoDevices3);
       }
         return list;
     }
