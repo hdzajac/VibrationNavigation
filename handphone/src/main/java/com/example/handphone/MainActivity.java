@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
     //Testing
     private static TextView msgTestView;
-
+    private Vibrator mVibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +63,7 @@ public class MainActivity extends AppCompatActivity {
         statusTextView = findViewById(R.id.status);
         //msgTestView = findViewById(R.id.msg);
 
-        initList();
+        mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
         mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
@@ -190,11 +190,7 @@ public class MainActivity extends AppCompatActivity {
                     if(readBuf.length>=1) {
                         //todo some validation for trash
                         vibrationID=readBuf[0];
-                        VibrationPattern selectedPattern = vibrationList.get(vibrationID-1);
-
-                        Vibrator mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-                        mVibrator.vibrate(selectedPattern.getPatternAhead(), -1);
+                        mVibrator.vibrate(VibrationConstants.getVibrationType(vibrationID), -1);
                     }
                     break;
                 case MESSAGE_DISCONNECTED:
@@ -213,57 +209,4 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
-    private void initList() {
-        //todo
-        //will identify patterns by id uniquely send the id to bluetooth device together with LEFT RIGHT AHEAD ETC;
-
-        vibrationList = new ArrayList<>();
-
-        // Patters for 1 device
-                VibrationPattern pattern1 = new VibrationPattern("LOW_PERIODIC", VibrationConstants.LONG_PERIODIC_1,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC);
-
-        VibrationPattern pattern2 = new VibrationPattern("HIGH_PERIODIC", VibrationConstants.HIGH_PERIODIC_1,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC);
-
-        VibrationPattern pattern3 = new VibrationPattern("LONG_CONTINUOUS", VibrationConstants.LONG_CONTINUOUS_2,
-                PredefinedPatterns.LONG_CONTINUOUS,
-                PredefinedPatterns.LONG_CONTINUOUS,
-                PredefinedPatterns.LONG_CONTINUOUS,
-                PredefinedPatterns.LONG_CONTINUOUS);
-
-        VibrationPattern pattern4 = new VibrationPattern("SHORT_CONTINUOUS", VibrationConstants.SHORT_CONTINUOUS_2,
-                PredefinedPatterns.SHORT_CONTINUOUS,
-                PredefinedPatterns.SHORT_CONTINUOUS,
-                PredefinedPatterns.SHORT_CONTINUOUS,
-                PredefinedPatterns.SHORT_CONTINUOUS);
-
-        //Patterns for 2 devices
-        VibrationPattern pattern1_2 = new VibrationPattern("LOW_PERIODIC", VibrationConstants.LONG_PERIODIC_2,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC,
-                PredefinedPatterns.LOW_PERIODIC);
-
-        VibrationPattern pattern2_2 = new VibrationPattern("HIGH_PERIODIC", VibrationConstants.HIGH_PERIODIC_2,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC,
-                PredefinedPatterns.HIGH_PERIODIC);
-
-        //Adding them according to index to et them by id directly
-        vibrationList.add(pattern1);
-        vibrationList.add(pattern2);
-        vibrationList.add(pattern3);
-        vibrationList.add(pattern4);
-        vibrationList.add(pattern1_2);
-        vibrationList.add(pattern2_2);
-
-    }
 }
