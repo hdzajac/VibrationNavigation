@@ -3,32 +3,28 @@ package com.navigation.vibration;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Vibrator;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.Spinner;
 
-import com.navigation.vibration.adaptors.VibrationPatternAdaptor;
 import com.navigation.vibration.models.VibrationConstants;
 import com.navigation.vibration.models.VibrationPattern;
 
-import java.util.ArrayList;
-
-public class PatternSelectionActivity extends Activity {
+public class PatternSelectionActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     public static final String VIBRATION_POSITION = "chosen_vibration";
-    private ArrayList<VibrationPattern> vibrationPatterns;
-    private int noDevices = 1;
-
-    private Vibrator mVibrator;
-
-    //choose vibrations by list position
-    private int chosenVibrationID = 1;
+    private static int MOTORS = 2;
+    private static VibrationPattern vibrationPattern;
+    private static int vibrationPatternId;
+    private static final String TAG = "PatternSelection";
+    private static Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,75 +34,76 @@ public class PatternSelectionActivity extends Activity {
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        String message = intent.getStringExtra(NoDevicesSelectionActivity.NO_DEVICES);
-        try {
-            noDevices = Integer.parseInt(message);
-        } catch (Exception e) {
-            Log.e("PatternSelection", "Bad number of devices");
-        }
+        MOTORS = intent.getIntExtra(NoDevicesSelectionActivity.NO_DEVICES, 2);
 
-        ListView listView =  findViewById(R.id.pattern_list);
-        vibrationPatterns = initList(noDevices);
-        VibrationPatternAdaptor adapter   = new VibrationPatternAdaptor(this, vibrationPatterns);
-        listView.setAdapter(adapter);
+        int optionsArrayRes = MOTORS == 2 ? R.array.pattern_selection_spinner_list_2 : R.array.pattern_selection_spinner_list_1;
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        Spinner spinner = findViewById(R.id.pattern_selection_spinner);
 
-            public void onItemClick(AdapterView<?> adapter, View v, int position, long id) {
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                optionsArrayRes, android.R.layout.simple_spinner_item);
 
-                vibrationPreview(position);
+        // Apply the adapter to the spinner
+        spinner.setAdapter(adapter);
+        // Set this activity as listener
+        spinner.setOnItemSelectedListener(this);
+
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+            if (vibrator == null) {
+                Log.d(TAG, "API TO LOW, can't vibrate");
             }
-        });
-
-    }
-
-
-    private void vibrationPreview(int position) {
-        final VibrationPattern  selectedPattern = vibrationPatterns.get(position);
-        Handler handler = new Handler();
-        chosenVibrationID = selectedPattern.getId();
-
-        // actual vibration thingy here....
-
-        Vibrator mVibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-         mVibrator  = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-
-
-    }
-
-    private void patternPreview(TextView ui, long[] pattern)
-    {
-        ui.setBackgroundColor(getResources().getColor(R.color.button_green));
-        mVibrator.vibrate(pattern, -1);
-        try {
-            Thread.sleep(3000);
-        } catch (Exception e) {}
-        mVibrator.cancel();
-        ui.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
     }
 
 
     public void goToNextActivity(View view) {
         Intent intent = new Intent(this, MapsActivity.class);
-        intent.putExtra(VIBRATION_POSITION, chosenVibrationID);
-        intent.putExtra(NoDevicesSelectionActivity.NO_DEVICES,noDevices);
+        intent.putExtra(VIBRATION_POSITION, vibrationPatternId);
+        intent.putExtra(NoDevicesSelectionActivity.NO_DEVICES,MOTORS);
         startActivity(intent);
     }
 
-    // the list of possible patterns depending on the number of devices
-    private ArrayList<VibrationPattern>  initList(int noDevices)
-    {
-        ArrayList<VibrationPattern> list = new ArrayList<>();
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        Log.i(TAG, "selected vibrationPattern: " + parent.getItemAtPosition(position));
 
-        if (noDevices == 1) {
-            list.add(VibrationConstants.OneDevice1);
-            list.add(VibrationConstants.OneDevice2);
+        if(MOTORS == 2) {
+            vibrationPattern = VibrationConstants.getVibrationPattern(position + 1);
+            vibrationPatternId = position + 1;
         }
-        else{
-            list.add(VibrationConstants.TwoDevices1);
-            list.add(VibrationConstants.TwoDevices2);
-            list.add(VibrationConstants.TwoDevices3);
-      }
-        return list;
+        else {
+            vibrationPattern = VibrationConstants.getVibrationPattern(position + 4);
+            vibrationPatternId = position + 4;
+        }
+        View gridView = findViewById(R.id.pattern_selection_grid_layout);
+        if (gridView.getVisibility() != View.VISIBLE)
+            gridView.setVisibility(View.VISIBLE);
+
     }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+        // do nothing, wait
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void vibrateTop(View view) {
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternAhead(),-1));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void vibrateBottom(View view) {
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternBack(),-1));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void vibrateLeft(View view) {
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternLeft(),-1));
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public void vibrateRight(View view) {
+        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternRight(),-1));
+    }
+
 }

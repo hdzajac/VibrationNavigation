@@ -8,74 +8,51 @@
     tools:context=".PatternSelectionActivity" >
 
 
-    <ListView
-        android:id="@+id/pattern_list"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5" />
+    <Spinner
+        android:id="@+id/pattern_selection_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:spinnerMode="dialog"/>
 
+    <GridLayout
+        android:id="@+id/pattern_selection_grid_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:columnCount="3"
+        android:rowCount="3"
+        android:orientation="horizontal"
+        android:layout_gravity="center"
+        android:visibility="gone"        >
+        <Space />
 
-    <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="fill_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.5"
-        android:stretchColumns="1">
+        <Button
+            android:id="@+id/pattern_selection_button_top"
+            android:layout_column="1"
+            android:layout_row="0"
+            android:onClick="vibrateTop"
+            />
 
-        <TableRow>
+        <Button
+            android:id="@+id/pattern_selection_button_bottom"
+            android:layout_column="1"
+            android:layout_row="2"
+            android:onClick="vibrateBottom"
+            />
+        <Button
+            android:id="@+id/pattern_selection_button_left"
+            android:layout_column="0"
+            android:layout_row="1"
+            android:onClick="vibrateLeft"
+            />
 
-            <TextView
-                android:padding="3dip"
-                android:text="     " />
+        <Button
+            android:id="@+id/pattern_selection_button_right"
+            android:layout_column="2"
+            android:layout_row="1"
+            android:onClick="vibrateRight"
+            />
 
-            <TextView
-                android:id="@+id/text_up"
-                android:gravity="center"
-                android:padding="3dip"
-                android:text="up" />
-
-            <TextView
-                android:padding="3dip"
-                android:text="     " />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:padding="3dip"
-                android:text="     " />
-
-            <TextView
-                android:id="@+id/text_left"
-                android:gravity="left"
-                android:padding="3dip"
-                android:text="left" />
-
-            <TextView
-                android:id="@+id/text_right"
-                android:gravity="right"
-                android:padding="3dip"
-                android:text="right" />
-        </TableRow>
-
-        <TableRow>
-
-            <TextView
-                android:padding="3dip"
-                android:text="   " />
-
-            <TextView
-                android:id="@+id/text_down"
-                android:gravity="center"
-                android:padding="3dip"
-                android:text="down  " />
-
-            <TextView
-                android:padding="3dip"
-                android:text="   " />
-
-        </TableRow>
-
-    </TableLayout>
+    </GridLayout>
 
     <Button
         android:id="@+id/button9"
@@ -83,7 +60,7 @@
         android:layout_height="wrap_content"
         android:onClick="goToNextActivity"
         android:text="Next"
-        android:layout_gravity="center"
+        android:layout_gravity="bottom"
          />
 </LinearLayout>
 

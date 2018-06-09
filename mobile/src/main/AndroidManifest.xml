@@ -46,12 +46,7 @@
 
         <activity
             android:name=".MapsActivity"
-            android:label="@string/title_activity_maps">
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter>
-        </activity>
+            android:label="@string/title_activity_maps" />
         <activity
             android:name=".ConnectionActivity"
             android:label="@string/title_activity_connection"
@@ -67,14 +62,14 @@
             android:configChanges="orientation|keyboardHidden"
             android:label="@string/select_device">
         </activity>
-        <!--Launcher activity-->
-        <activity android:name=".NoDevicesSelectionActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
+        <activity android:name=".PatternSelectionActivity">
         </activity>
-        <activity android:name=".PatternSelectionActivity"></activity>
+        <activity android:name=".NoDevicesSelectionActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <!--Developers should put application credentials here.To obtain them, please register the application
     at https://developer.here.com/develop/mobile-sdks-->
         <meta-data
