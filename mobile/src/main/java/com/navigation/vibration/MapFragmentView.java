@@ -1,19 +1,26 @@
 package com.navigation.vibration;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.here.android.mpa.common.GeoBoundingBox;
 import com.here.android.mpa.common.GeoCoordinate;
 import com.here.android.mpa.common.GeoPosition;
+import com.here.android.mpa.common.Image;
 import com.here.android.mpa.common.LocationDataSourceHERE;
 import com.here.android.mpa.common.OnEngineInitListener;
 import com.here.android.mpa.common.PositioningManager;
+import com.here.android.mpa.common.ViewObject;
 import com.here.android.mpa.guidance.NavigationManager;
 import com.here.android.mpa.mapping.Map;
 import com.here.android.mpa.mapping.MapFragment;
+import com.here.android.mpa.mapping.MapGesture;
+import com.here.android.mpa.mapping.MapMarker;
+import com.here.android.mpa.mapping.MapObject;
 import com.here.android.mpa.mapping.MapRoute;
 import com.here.android.mpa.mapping.MapState;
 import com.here.android.mpa.routing.CoreRouter;
@@ -25,22 +32,22 @@ import com.here.android.mpa.routing.RouteResult;
 import com.here.android.mpa.routing.RouteWaypoint;
 import com.here.android.mpa.routing.Router;
 import com.here.android.mpa.routing.RoutingError;
-import com.here.android.positioning.StatusListener;
 import com.navigation.vibration.models.VibrationConstants;
 import com.navigation.vibration.models.VibrationPattern;
 import com.navigation.vibration.service.BluetoothService;
+import com.here.android.mpa.mapping.MapScreenMarker;
 
-import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.PointF;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Vibrator;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -53,6 +60,8 @@ import android.widget.Toast;
  * the usage.
  */
 public class MapFragmentView implements PositioningManager.OnPositionChangedListener, Map.OnTransformListener {
+    private String TAG = "MapFragment";
+
     private MapFragment m_mapFragment;
     private MapsActivity m_activity;
     private Button m_naviControlButton;
@@ -70,27 +79,25 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
     private boolean mTransforming;
     private PositioningManager mPositioningManager;
 
-    private String TAG = "MapFragment";
     // callback that is called when transforming ends
     private Runnable mPendingUpdate;
 
-    // text view instance for showing location information
-    private TextView mLocationInfo;
     private Maneuver m_currentManeuver = null;
 
     private int noDevices;
     VibrationPattern chosenVibrationPattern;
+    private List<MapMarker> markerList = new ArrayList<>();
 
 
     public MapFragmentView(MapsActivity activity, int vibrationId, int devices) {
         m_activity = activity;
-        noDevices=devices;
+        noDevices = devices;
         chosenVibrationPattern = VibrationConstants.getVibrationPattern(vibrationId);
         initMapFragment();
         initNaviControlButton();
 
     }
-    // Resume positioning listener on wake up
+    // Resume positioning gestureListener on wake up
 
     private void initMapFragment() {
         /* Locate the mapFragment UI element */
@@ -124,6 +131,10 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                     public void onEngineInitializationCompleted(OnEngineInitListener.Error error) {
 
                         if (error == Error.NONE) {
+
+                            //added gestureListener
+                            m_mapFragment.getMapGesture().addOnGestureListener(new MyOnGestureListener());
+
                             m_map = m_mapFragment.getMap();
 
                             m_map.setCenter(m_current_location,
@@ -172,10 +183,12 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
          */
         RouteOptions routeOptions = new RouteOptions();
         /* Other transport modes are also available e.g Pedestrian */
-        routeOptions.setTransportMode(RouteOptions.TransportMode.CAR);
+        routeOptions.setTransportMode(RouteOptions.TransportMode.PEDESTRIAN);
         /* Disable highway in this route. */
         routeOptions.setHighwaysAllowed(false);
         /* Calculate the shortest route available. */
+
+        //WHAT DOES BALANCED MEAN
         routeOptions.setRouteType(RouteOptions.Type.SHORTEST);
         /* Calculate 1 route. */
         routeOptions.setRouteCount(1);
@@ -188,9 +201,15 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
 
         /* Add both waypoints to the route plan */
         routePlan.addWaypoint(startPoint);
+
+        //Add coordinates from markers
+        for (MapMarker marker : markerList) {
+            routePlan.addWaypoint(new RouteWaypoint(marker.getCoordinate()));
+        }
+
         routePlan.addWaypoint(destination);
 
-        /* Trigger the route calculation,results will be called back via the listener */
+        /* Trigger the route calculation,results will be called back via the gestureListener */
         coreRouter.calculateRoute(routePlan,
                 new Router.Listener<List<RouteResult>, RoutingError>() {
 
@@ -205,10 +224,13 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                         /* Calculation is done.Let's handle the result */
                         if (routingError == RoutingError.NONE) {
                             if (routeResults.get(0).getRoute() != null) {
+                                RouteResult routeResult = routeResults.get(0);
 
-                                m_route = routeResults.get(0).getRoute();
+
+                                m_route = routeResult.getRoute();
                                 /* Create a MapRoute so that it can be placed on the map */
-                                MapRoute mapRoute = new MapRoute(routeResults.get(0).getRoute());
+                                MapRoute mapRoute = new MapRoute(routeResult.getRoute());
+                                mapRoute.setColor(Color.BLUE);
 
                                 /* Show the maneuver number on top of the route */
                                 mapRoute.setManeuverNumberVisible(true);
@@ -221,11 +243,12 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                                  * We may also want to make sure the map view is orientated properly
                                  * so the entire route can be easily seen.
                                  */
-                                m_geoBoundingBox = routeResults.get(0).getRoute().getBoundingBox();
+                                m_geoBoundingBox = routeResult.getRoute().getBoundingBox();
                                 m_map.zoomTo(m_geoBoundingBox, Map.Animation.NONE,
                                         Map.MOVE_PRESERVE_ORIENTATION);
 
                                 startNavigation();
+
                             } else {
                                 Toast.makeText(m_activity,
                                         "Error:route results returned is not valid",
@@ -260,14 +283,23 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                  *
                  */
 
-                m_navigationManager.stop();
+                //m_navigationManager.stop();
                 /*
                  * Restore the map orientation to show entire route on screen
                  */
-                m_map.zoomTo(m_geoBoundingBox, Map.Animation.NONE, 0f);
-                m_naviControlButton.setText(R.string.start_navi);
-                m_naviControlButton.setText(R.string.start_navi);
-                m_route = null;
+                if (m_route == null) {
+                    //if destination missing choose last added marker as destination
+                    GeoCoordinate geo = markerList.get(markerList.size()-1).getCoordinate();
+                    createRoute(new LatLng (geo.getLatitude(),geo.getLongitude()));
+                } else {
+                    m_navigationManager.stop();
+                    /*
+                     * Restore the map orientation to show entire route on screen
+                     */
+                    m_map.zoomTo(m_geoBoundingBox, Map.Animation.NONE, 0f);
+                    m_naviControlButton.setText(R.string.start_navi);
+                    m_route = null;
+                }
 
             }
         });
@@ -320,7 +352,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         });
         alertDialogBuilder.setPositiveButton("Simulation", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialoginterface, int i) {
-                m_navigationManager.simulate(m_route, 100);//Simualtion speed is set to 60 m/s
+                m_navigationManager.simulate(m_route, 500);//Simualtion speed is set to 500 m/s
                 m_map.setTilt(60);
                 startForegroundService();
             }
@@ -342,6 +374,115 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
          * listeners for demo purpose,please refer to HERE Android SDK API documentation for details
          */
         addNavigationListeners();
+    }
+
+    private class MyOnGestureListener implements MapGesture.OnGestureListener {
+
+        @Override
+        public void onPanStart() {
+        }
+
+        @Override
+        public void onPanEnd() {
+        }
+
+        @Override
+        public void onMultiFingerManipulationStart() {
+        }
+
+        @Override
+        public void onMultiFingerManipulationEnd() {
+        }
+
+        @Override
+        public boolean onMapObjectsSelected(List<ViewObject> objects) {
+            for (ViewObject viewObj : objects) {
+                if (viewObj.getBaseType() == ViewObject.Type.USER_OBJECT) {
+                    if (((MapObject) viewObj).getType() == MapObject.Type.ROUTE) {
+                        // At this point we have the originally added
+                        // map marker, so we can do something with it
+                        // (like change the visibility, or more
+                        // marker-specific actions)
+                        //((MapRoute) viewObj).setVisible(false);
+
+                        //Here if you want to add a marker and it is to close to another one it will remove it and add the new one
+                        m_map.removeMapObject((MapObject) viewObj);
+
+                    } else if (((MapObject) viewObj).getType() == MapObject.Type.MARKER) {
+                        MapMarker marker = (MapMarker) viewObj;
+                        markerList.remove(marker);
+                        m_map.removeMapObject(marker);
+                    }
+                }
+            }
+//            // return false to allow the map to handle this callback also
+            return false;
+        }
+
+        @Override
+        public boolean onTapEvent(PointF p) {
+            MapMarker marker;
+            GeoCoordinate position = m_map.pixelToGeo(p);
+            Image m_marker_image = new Image();
+            try {
+                m_marker_image.setImageResource(R.drawable.marker);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Error image marker.");
+            }
+
+            //marker.setCoordinate(new GeoCoordinate(p.x,p.y));
+            marker = new MapMarker(position, m_marker_image);
+            //marker.setAnchorPoint(p);
+
+            markerList.add(marker);
+            m_map.addMapObject(marker);
+            // m_tap_marker.setScreenCoordinate(pointF);
+            Log.v(TAG, "Added map marker.");
+            return false;
+        }
+
+        @Override
+        public boolean onDoubleTapEvent(PointF p) {
+            return false;
+        }
+
+        @Override
+        public void onPinchLocked() {
+        }
+
+        @Override
+        public boolean onPinchZoomEvent(float scaleFactor, PointF p) {
+            return false;
+        }
+
+        @Override
+        public void onRotateLocked() {
+        }
+
+        @Override
+        public boolean onRotateEvent(float rotateAngle) {
+            return false;
+        }
+
+        @Override
+        public boolean onTiltEvent(float angle) {
+            return false;
+        }
+
+        @Override
+        public boolean onLongPressEvent(PointF p) {
+            return false;
+        }
+
+        @Override
+        public void onLongPressRelease() {
+        }
+
+        @Override
+        public boolean onTwoFingerTapEvent(PointF p) {
+            return false;
+        }
     }
 
     private void addNavigationListeners() {
@@ -376,7 +517,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         public void onNewInstructionEvent() {
             super.onNewInstructionEvent();
             Maneuver maneuver = m_navigationManager.getNextManeuver();
-            int turn=-1;
+            int turn = -1;
             if (maneuver != null) {
                 if (maneuver.getAction() == Maneuver.Action.END) {
                     //notify the user that the route is complete
@@ -427,21 +568,13 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                         turn = VibrationConstants.AHEAD;
                         break;
                     default:
-                        Log.v(TAG,maneuver.getTurn().toString());
+                        Log.v(TAG, maneuver.getTurn().toString());
                         break;
                 }
 
                 vibrate(turn);
 
                 m_currentManeuver = maneuver;
-                //TRAFFIC DIRECTION IS NOT TURN
-                //if (maneuver.getTrafficDirection() == Maneuver.TrafficDirection.LEFT)
-                //    Toast.makeText(m_activity, "LEFT", Toast.LENGTH_SHORT).show();
-                //else if (maneuver.getTrafficDirection() == Maneuver.TrafficDirection.RIGHT)
-                //    Toast.makeText(m_activity, "RIGHT", Toast.LENGTH_SHORT).show();
-
-                //display current or next road information
-                //display maneuver.getDistanceToNextManeuver()
             }
         }
     };
@@ -492,6 +625,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
     @Override
     public void onPositionUpdated(final PositioningManager.LocationMethod locationMethod, final GeoPosition geoPosition, final boolean mapMatched) {
         final GeoCoordinate coordinate = geoPosition.getCoordinate();
+
         m_current_location = coordinate;
         if (mTransforming) {
             mPendingUpdate = new Runnable() {
@@ -529,55 +663,55 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
 
     //BACK and ahead always sent to both devices
     private void vibrate(int position) {
-        byte tag=0;
+        byte tag = 0;
         byte[] msg = new byte[1];
 
         switch (position) {
             case VibrationConstants.AHEAD: //-1 means repeats once
                 tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternAhead());
-                msg[0]=tag;
+                msg[0] = tag;
 
-                if(noDevices==1){
-                    Log.v(TAG,"Sending to right vibration ahead");
-                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                if (noDevices == 1) {
+                    Log.v(TAG, "Sending to right vibration ahead");
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 } else {
-                    Log.v(TAG,"Sending to both vibration ahead");
-                    BluetoothService.getInstance().write(VibrationConstants.LEFT,msg);
-                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                    Log.v(TAG, "Sending to both vibration ahead");
+                    BluetoothService.getInstance().write(VibrationConstants.LEFT, msg);
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 }
                 break;
             case VibrationConstants.RIGHT:
                 tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternRight());
 
-                msg[0]=tag;
-                Log.v(TAG,"Sending to right vibration right");
+                msg[0] = tag;
+                Log.v(TAG, "Sending to right vibration right");
                 //do not check for number of devices since default is right
-                BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
 
                 break;
             case VibrationConstants.LEFT:
                 tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternLeft());
-                msg[0]=tag;
+                msg[0] = tag;
 
-                if(noDevices==1){
-                    Log.v(TAG,"Sending to right vibration left");
-                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                if (noDevices == 1) {
+                    Log.v(TAG, "Sending to right vibration left");
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 } else {
-                    Log.v(TAG,"Sending to left vibration left");
-                    BluetoothService.getInstance().write(VibrationConstants.LEFT,msg);
+                    Log.v(TAG, "Sending to left vibration left");
+                    BluetoothService.getInstance().write(VibrationConstants.LEFT, msg);
                 }
                 break;
             case VibrationConstants.BACK:
                 tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternBack());
-                msg[0]=tag;
+                msg[0] = tag;
 
-                if(noDevices==1){
-                    Log.v(TAG,"Sending to right vibration back");
-                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                if (noDevices == 1) {
+                    Log.v(TAG, "Sending to right vibration back");
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 } else {
-                    Log.v(TAG,"Sending to both vibration back");
-                    BluetoothService.getInstance().write(VibrationConstants.LEFT,msg);
-                    BluetoothService.getInstance().write(VibrationConstants.RIGHT,msg);
+                    Log.v(TAG, "Sending to both vibration back");
+                    BluetoothService.getInstance().write(VibrationConstants.LEFT, msg);
+                    BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 }
                 break;
             default:
