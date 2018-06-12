@@ -22,5 +22,25 @@ public class PredefinedPatterns {
                     dotter, long_gap, dotter, long_gap, dotter, long_gap,
                     dotter, long_gap, dotter, long_gap, dotter, long_gap,
             };
+
+    public static long[] LEFT_APPLE =
+            { 0,  // Start immediately
+                    dot, short_gap, dot,
+                    long_gap,
+                    dot, short_gap, dot,
+                    long_gap,
+                    dot, short_gap, dot
+            };
+
+    public static long[] RIGHT_APPLE =
+            { 0,  // Start immediately
+                    dot, short_gap, dot, short_gap, dot,
+                    dot, short_gap, dot, short_gap, dot,
+                    dot, short_gap, dot, short_gap, dot,
+                    dot, short_gap, dot, short_gap, dot
+            };
+
+    public static long[] NONE =
+            { 0 };
 }
 

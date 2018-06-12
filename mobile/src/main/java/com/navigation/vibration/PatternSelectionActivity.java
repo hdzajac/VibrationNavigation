@@ -34,7 +34,7 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        MOTORS = intent.getIntExtra(NoDevicesSelectionActivity.NO_DEVICES, 2);
+        MOTORS = intent.getIntExtra(NoDevicesSelectionActivity.NO_DEVICES, 1);
 
         int optionsArrayRes = MOTORS == 2 ? R.array.pattern_selection_spinner_list_2 : R.array.pattern_selection_spinner_list_1;
 

@@ -39,8 +39,7 @@
     </string-array>
 
     <string-array name="pattern_selection_spinner_list_1">
-        <item>Periodic + continuous on sides</item>
-        <item>Periodic on sides</item>
+        <item>Apple Watch</item>
     </string-array>
 
 
