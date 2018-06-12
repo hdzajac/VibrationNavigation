@@ -421,24 +421,6 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
 
         @Override
         public boolean onTapEvent(PointF p) {
-            MapMarker marker;
-            GeoCoordinate position = m_map.pixelToGeo(p);
-            Image m_marker_image = new Image();
-            try {
-                m_marker_image.setImageResource(R.drawable.marker);
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.e(TAG, "Error image marker.");
-            }
-
-            //marker.setCoordinate(new GeoCoordinate(p.x,p.y));
-            marker = new MapMarker(position, m_marker_image);
-            //marker.setAnchorPoint(p);
-
-            markerList.add(marker);
-            m_map.addMapObject(marker);
-            // m_tap_marker.setScreenCoordinate(pointF);
-            Log.v(TAG, "Added map marker.");
             return false;
         }
 
@@ -472,6 +454,24 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
 
         @Override
         public boolean onLongPressEvent(PointF p) {
+            MapMarker marker;
+            GeoCoordinate position = m_map.pixelToGeo(p);
+            Image m_marker_image = new Image();
+            try {
+                m_marker_image.setImageResource(R.drawable.marker);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Error image marker.");
+            }
+
+            //marker.setCoordinate(new GeoCoordinate(p.x,p.y));
+            marker = new MapMarker(position, m_marker_image);
+            //marker.setAnchorPoint(p);
+
+            markerList.add(marker);
+            m_map.addMapObject(marker);
+            // m_tap_marker.setScreenCoordinate(pointF);
+            Log.v(TAG, "Added map marker.");
             return false;
         }
 
@@ -635,7 +635,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                 }
             };
         } else {
-            m_map.setCenter(coordinate, Map.Animation.BOW);
+            //m_map.setCenter(coordinate, Map.Animation.BOW);
             //updateLocationInfo(locationMethod, geoPosition);
         }
     }
