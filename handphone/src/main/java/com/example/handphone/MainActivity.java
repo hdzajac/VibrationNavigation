@@ -186,12 +186,24 @@ public class MainActivity extends AppCompatActivity {
                     String readMessage = new String(readBuf, 0, msg.arg1);
                     Log.v(TAG,"Received "+readMessage);
 
-                    byte vibrationID;
+                    final byte vibrationID;
                     if(readBuf.length>=1) {
                         //todo some validation for trash
                         vibrationID=readBuf[0];
                         mVibrator.vibrate(VibrationConstants.getVibrationType(vibrationID), -1);
-                    }
+                        ( (Activity) getApplicationContext()).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText((Activity) getApplicationContext(),"Received and vibrating "+vibrationID,Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    } else {
+                        ( (Activity) getApplicationContext()).runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText((Activity) getApplicationContext(),"Received and NOT vibrating ",Toast.LENGTH_SHORT).show();
+                            }
+                        });                    }
                     break;
                 case MESSAGE_DISCONNECTED:
                     statusTextView.setText(getString(R.string.disconnected));

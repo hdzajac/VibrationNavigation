@@ -265,6 +265,34 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
     }
 
     private void initNaviControlButton() {
+        Button upButton = (Button) m_activity.findViewById(R.id.naviUp);
+        upButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                vibrate(VibrationConstants.AHEAD);
+            }
+        });
+        Button downButton = (Button) m_activity.findViewById(R.id.naviDown);
+        downButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                vibrate(VibrationConstants.BACK);
+            }
+        });
+        Button leftButton = (Button) m_activity.findViewById(R.id.naviLeft);
+        leftButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                vibrate(VibrationConstants.LEFT);
+            }
+        });
+        Button rightButton = (Button) m_activity.findViewById(R.id.naviRight);
+        rightButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                vibrate(VibrationConstants.RIGHT);
+            }
+        });
         m_naviControlButton = (Button) m_activity.findViewById(R.id.naviCtrlButton);
         m_naviControlButton.setText(R.string.start_navi);
         m_naviControlButton.setOnClickListener(new View.OnClickListener() {
@@ -289,8 +317,8 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                  */
                 if (m_route == null) {
                     //if destination missing choose last added marker as destination
-                    GeoCoordinate geo = markerList.get(markerList.size()-1).getCoordinate();
-                    createRoute(new LatLng (geo.getLatitude(),geo.getLongitude()));
+                    GeoCoordinate geo = markerList.get(markerList.size() - 1).getCoordinate();
+                    createRoute(new LatLng(geo.getLatitude(), geo.getLongitude()));
                 } else {
                     m_navigationManager.stop();
                     /*
@@ -352,7 +380,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         });
         alertDialogBuilder.setPositiveButton("Simulation", new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialoginterface, int i) {
-                m_navigationManager.simulate(m_route, 500);//Simualtion speed is set to 500 m/s
+                m_navigationManager.simulate(m_route, 20);//Simualtion speed is set to 500 m/s
                 m_map.setTilt(60);
                 startForegroundService();
             }
@@ -516,12 +544,14 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         @Override
         public void onNewInstructionEvent() {
             super.onNewInstructionEvent();
-            Maneuver maneuver = m_navigationManager.getNextManeuver();
+            final Maneuver maneuver = m_navigationManager.getNextManeuver();
+
             int turn = -1;
             if (maneuver != null) {
                 if (maneuver.getAction() == Maneuver.Action.END) {
                     //notify the user that the route is complete
                 }
+                //switch (m_currentManeuver.getTurn()) {
                 switch (m_currentManeuver.getTurn()) {
                     case QUITE_RIGHT: //A turn that indicates making a normal right turn.
                         turn = VibrationConstants.RIGHT;
@@ -571,9 +601,8 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                         Log.v(TAG, maneuver.getTurn().toString());
                         break;
                 }
-
+                Log.v(TAG,"action "+m_currentManeuver.getAction().toString());
                 vibrate(turn);
-
                 m_currentManeuver = maneuver;
             }
         }
@@ -665,6 +694,7 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
     private void vibrate(int position) {
         byte tag = 0;
         byte[] msg = new byte[1];
+        String log_msg = "";
 
         switch (position) {
             case VibrationConstants.AHEAD: //-1 means repeats once
@@ -672,10 +702,14 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                 msg[0] = tag;
 
                 if (noDevices == 1) {
-                    Log.v(TAG, "Sending to right vibration ahead");
+                    log_msg = "Sending to right vibration ahead";
+                    Log.v(TAG, log_msg);
+                    Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 } else {
-                    Log.v(TAG, "Sending to both vibration ahead");
+                    log_msg = "Sending to both vibration ahead";
+                    Log.v(TAG, log_msg);
+                    Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.LEFT, msg);
                     BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 }
@@ -684,8 +718,11 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                 tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternRight());
 
                 msg[0] = tag;
-                Log.v(TAG, "Sending to right vibration right");
+                log_msg = "Sending to right vibration right";
+                Log.v(TAG, log_msg);
+
                 //do not check for number of devices since default is right
+                Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                 BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
 
                 break;
@@ -694,10 +731,14 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                 msg[0] = tag;
 
                 if (noDevices == 1) {
-                    Log.v(TAG, "Sending to right vibration left");
+                    log_msg = "Sending to right vibration left";
+                    Log.v(TAG, log_msg);
+                    Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 } else {
-                    Log.v(TAG, "Sending to left vibration left");
+                    log_msg = "Sending to left vibration left";
+                    Log.v(TAG, log_msg);
+                    Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.LEFT, msg);
                 }
                 break;
@@ -706,16 +747,22 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
                 msg[0] = tag;
 
                 if (noDevices == 1) {
-                    Log.v(TAG, "Sending to right vibration back");
+                    log_msg = "Sending to right vibration back";
+                    Log.v(TAG, log_msg);
+                    Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 } else {
-                    Log.v(TAG, "Sending to both vibration back");
+                    log_msg = "Sending to both vibration back";
+                    Log.v(TAG, log_msg);
+                    Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.LEFT, msg);
                     BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 }
                 break;
             default:
-                Log.e(TAG, "Bad turn value " + tag);
+                log_msg = "Unknown turn value " + tag;
+                //Toast.makeText(m_activity,log_msg,Toast.LENGTH_SHORT);
+                Log.i(TAG, log_msg);
                 break;
         }
     }

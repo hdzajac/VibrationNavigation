@@ -14,8 +14,42 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:id="@+id/naviCtrlButton"
         app:layout_constraintDimensionRatio="3:1"/>
-
-
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toLeftOf="@id/naviCtrlButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="←"
+        android:id="@+id/naviLeft"
+        />
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toLeftOf="@id/naviLeft"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="→	"
+        android:id="@+id/naviRight"
+        />
+    <Button
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toLeftOf="@id/naviRight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="↑"
+        android:id="@+id/naviUp"
+        />
+    <Button
+        android:id="@+id/naviDown"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintRight_toLeftOf="@id/naviUp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="↓"
+        />
     <fragment
         android:id="@+id/place_autocomplete_fragment"
         android:layout_width="match_parent"
