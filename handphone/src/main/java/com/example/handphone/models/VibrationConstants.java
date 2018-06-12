@@ -44,34 +44,24 @@ public class VibrationConstants {
             PredefinedPatterns.RIGHT_APPLE,
             PredefinedPatterns.NONE);
 
-    public static VibrationPattern getVibrationPattern(int id)
-    {
+
+
+    public static long[] getVibrationType(int id) {
         switch (id) {
-            case TWO_DEVICES_1:
-                return TwoDevices1;
-            case TWO_DEVICES_2:
-                return TwoDevices2;
-            case ONE_DEVICE_1:
-                return OneDevice1;
+            case LONG_CONTINUOUS_TAG:
+                return PredefinedPatterns.LONG_CONTINUOUS;
+            case SHORT_CONTINUOUS_TAG:
+                return PredefinedPatterns.SHORT_CONTINUOUS;
+            case LOW_PERIODIC_TAG:
+                return PredefinedPatterns.LOW_PERIODIC;
+            case HIGH_PERIODIC_TAG:
+                return PredefinedPatterns.HIGH_PERIODIC;
+            case APPLE_LEFT_TAG:
+                return PredefinedPatterns.LEFT_APPLE;
+            case APPLE_RIGHT_TAG:
+                return PredefinedPatterns.RIGHT_APPLE;
             default:
                 return null;
         }
     }
-
-    public static byte pickVibrationTag(long[] pattern){
-        if(pattern == PredefinedPatterns.HIGH_PERIODIC)
-            return HIGH_PERIODIC_TAG;
-        else if (pattern == PredefinedPatterns.LOW_PERIODIC)
-            return LOW_PERIODIC_TAG;
-        else if (pattern == PredefinedPatterns.LONG_CONTINUOUS)
-            return LONG_CONTINUOUS_TAG;
-        else if (pattern == PredefinedPatterns.SHORT_CONTINUOUS)
-            return SHORT_CONTINUOUS_TAG;
-        else if (pattern == PredefinedPatterns.LEFT_APPLE)
-            return APPLE_LEFT_TAG;
-        else if (pattern == PredefinedPatterns.RIGHT_APPLE)
-            return APPLE_RIGHT_TAG;
-        return -1;
-    }
-
 }
