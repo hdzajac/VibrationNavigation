@@ -41,6 +41,6 @@ public class PredefinedPatterns {
             };
 
     public static long[] NONE =
-            { 0 };
+            { 1, 0 };
 }
 

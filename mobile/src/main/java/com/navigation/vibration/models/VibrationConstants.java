@@ -9,6 +9,8 @@ public class VibrationConstants {
     public static final byte LONG_CONTINUOUS_TAG= 2;
     public static final byte HIGH_PERIODIC_TAG= 3;
     public static final byte LOW_PERIODIC_TAG= 4;
+    public static final byte APPLE_LEFT_TAG= 5;
+    public static final byte APPLE_RIGHT_TAG= 6;
 
     //Position constants
     public static final byte LEFT = 1;
@@ -21,8 +23,7 @@ public class VibrationConstants {
     // the ids of the patterns
     public static final byte TWO_DEVICES_1= 1;
     public static final byte TWO_DEVICES_2= 2;
-    public static final byte TWO_DEVICES_3= 3;
-    public static final byte ONE_DEVICE_1= 4;
+    public static final byte ONE_DEVICE_1= 3;
 
 
     // The actual patters - see the doc file for more info
@@ -32,7 +33,7 @@ public class VibrationConstants {
             PredefinedPatterns.HIGH_PERIODIC,
             PredefinedPatterns.LONG_CONTINUOUS);
 
-    public static VibrationPattern TwoDevices2 = new VibrationPattern("Pattern 2 for two devices", VibrationConstants.TWO_DEVICES_3,
+    public static VibrationPattern TwoDevices2 = new VibrationPattern("Pattern 2 for two devices", VibrationConstants.TWO_DEVICES_2,
             PredefinedPatterns.SHORT_CONTINUOUS,
             PredefinedPatterns.LONG_CONTINUOUS,
             PredefinedPatterns.LONG_CONTINUOUS,
@@ -68,6 +69,10 @@ public class VibrationConstants {
             return LONG_CONTINUOUS_TAG;
         else if (pattern == PredefinedPatterns.SHORT_CONTINUOUS)
             return SHORT_CONTINUOUS_TAG;
+        else if (pattern == PredefinedPatterns.LEFT_APPLE)
+            return APPLE_LEFT_TAG;
+        else if (pattern == PredefinedPatterns.RIGHT_APPLE)
+            return APPLE_RIGHT_TAG;
         return -1;
     }
 

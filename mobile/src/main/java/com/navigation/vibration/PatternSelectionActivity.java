@@ -34,7 +34,7 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
 
         // Get the Intent that started this activity and extract the string
         Intent intent = getIntent();
-        MOTORS = intent.getIntExtra(NoDevicesSelectionActivity.NO_DEVICES, 1);
+        MOTORS = intent.getIntExtra(NoDevicesSelectionActivity.NO_DEVICES, 2);
 
         int optionsArrayRes = MOTORS == 2 ? R.array.pattern_selection_spinner_list_2 : R.array.pattern_selection_spinner_list_1;
 
@@ -65,16 +65,19 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        Log.i(TAG, "selected vibrationPattern: " + parent.getItemAtPosition(position));
 
         if(MOTORS == 2) {
             vibrationPattern = VibrationConstants.getVibrationPattern(position + 1);
             vibrationPatternId = position + 1;
         }
         else {
-            vibrationPattern = VibrationConstants.getVibrationPattern(position + 2);
+            vibrationPattern = VibrationConstants.getVibrationPattern(position + 3);
             vibrationPatternId = position + 2;
         }
+        Log.i(TAG, "selected vibrationPattern: " + parent.getItemAtPosition(position));
+        Log.i(TAG, "selected vibrationPattern at position: " + (position));
+        Log.i(TAG, "selected vibrationPattern vibrationID: " + (position));
+
         View gridView = findViewById(R.id.pattern_selection_grid_layout);
         if (gridView.getVisibility() != View.VISIBLE)
             gridView.setVisibility(View.VISIBLE);

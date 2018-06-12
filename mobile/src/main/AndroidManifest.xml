@@ -63,12 +63,13 @@
             android:label="@string/select_device">
         </activity>
         <activity android:name=".PatternSelectionActivity">
-        </activity>
-        <activity android:name=".NoDevicesSelectionActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity android:name=".NoDevicesSelectionActivity">
+
         </activity>
         <!--Developers should put application credentials here.To obtain them, please register the application
     at https://developer.here.com/develop/mobile-sdks-->
