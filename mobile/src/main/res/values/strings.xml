@@ -34,8 +34,7 @@
 
     <string-array name="pattern_selection_spinner_list_2">
         <item>High Frequency</item>
-        <item>Low Frequency</item>
-        <item>Short Continuous</item>
+        <item>Long Continuous</item>
     </string-array>
 
     <string-array name="pattern_selection_spinner_list_1">

@@ -30,16 +30,10 @@ public class VibrationConstants {
             PredefinedPatterns.NONE,
             PredefinedPatterns.HIGH_PERIODIC,
             PredefinedPatterns.HIGH_PERIODIC,
-            PredefinedPatterns.SHORT_CONTINUOUS);
+            PredefinedPatterns.LONG_CONTINUOUS);
 
     public static VibrationPattern TwoDevices2 = new VibrationPattern("Pattern 2 for two devices", VibrationConstants.TWO_DEVICES_3,
             PredefinedPatterns.SHORT_CONTINUOUS,
-            PredefinedPatterns.LOW_PERIODIC,
-            PredefinedPatterns.LOW_PERIODIC,
-            PredefinedPatterns.LONG_CONTINUOUS);
-
-    public static VibrationPattern TwoDevices3 = new VibrationPattern("Pattern 3 for two devices", VibrationConstants.TWO_DEVICES_3,
-            PredefinedPatterns.NONE,
             PredefinedPatterns.LONG_CONTINUOUS,
             PredefinedPatterns.LONG_CONTINUOUS,
             PredefinedPatterns.HIGH_PERIODIC);
@@ -58,8 +52,6 @@ public class VibrationConstants {
                 return TwoDevices1;
             case TWO_DEVICES_2:
                 return TwoDevices2;
-            case TWO_DEVICES_3:
-                return TwoDevices3;
             case ONE_DEVICE_1:
                 return OneDevice1;
             default:

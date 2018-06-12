@@ -72,8 +72,8 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
             vibrationPatternId = position + 1;
         }
         else {
-            vibrationPattern = VibrationConstants.getVibrationPattern(position + 4);
-            vibrationPatternId = position + 4;
+            vibrationPattern = VibrationConstants.getVibrationPattern(position + 2);
+            vibrationPatternId = position + 2;
         }
         View gridView = findViewById(R.id.pattern_selection_grid_layout);
         if (gridView.getVisibility() != View.VISIBLE)
