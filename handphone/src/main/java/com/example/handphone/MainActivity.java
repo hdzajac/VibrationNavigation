@@ -1,5 +1,6 @@
 package com.example.handphone;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Vibrator;
@@ -171,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // The Handler that gets information back from the BluetoothChatService
+    @SuppressLint("HandlerLeak")
     private final Handler mHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -190,18 +192,20 @@ public class MainActivity extends AppCompatActivity {
                     if(readBuf.length>=1) {
                         //todo some validation for trash
                         vibrationID=readBuf[0];
+                        Log.d(TAG,"VibrationID "+vibrationID);
+
                         mVibrator.vibrate(VibrationConstants.getVibrationType(vibrationID), -1);
-                        ( (Activity) getApplicationContext()).runOnUiThread(new Runnable() {
+                        ( MainActivity.this).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText((Activity) getApplicationContext(),"Received and vibrating "+vibrationID,Toast.LENGTH_SHORT).show();
+                                Toast.makeText( getApplicationContext(),"Received and vibrating "+vibrationID,Toast.LENGTH_SHORT).show();
                             }
                         });
                     } else {
                         ( (Activity) getApplicationContext()).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
-                                Toast.makeText((Activity) getApplicationContext(),"Received and NOT vibrating ",Toast.LENGTH_SHORT).show();
+                                Toast.makeText( getApplicationContext(),"Received and NOT vibrating ",Toast.LENGTH_SHORT).show();
                             }
                         });                    }
                     break;

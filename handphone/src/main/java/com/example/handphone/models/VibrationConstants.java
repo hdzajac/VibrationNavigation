@@ -9,6 +9,7 @@ public class VibrationConstants {
     public static final byte LOW_PERIODIC_TAG= 4;
     public static final byte APPLE_LEFT_TAG= 5;
     public static final byte APPLE_RIGHT_TAG= 6;
+    public static final byte NONE_TAG= 7;
 
     //Position constants
     public static final byte LEFT = 1;
@@ -60,6 +61,8 @@ public class VibrationConstants {
                 return PredefinedPatterns.LEFT_APPLE;
             case APPLE_RIGHT_TAG:
                 return PredefinedPatterns.RIGHT_APPLE;
+            case NONE_TAG:
+                return PredefinedPatterns.NONE;
             default:
                 return null;
         }

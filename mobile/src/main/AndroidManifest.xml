@@ -77,6 +77,7 @@
         <meta-data
             android:name="com.here.android.maps.apptoken"
             android:value="fC2mTctcAe3nWTp8CjOGfw" />
+
         <meta-data
             android:name="com.here.android.maps.license.key"
             android:value="DVdoqoXdcZqnsZmTmqWXTtOdJZv4AWnuN//oI2wN1xyXrTJab4z5FYbzjshzOcU+59wh1XH7YkDStTCb3n3lhaAFoewTMr1FURArgYN5zOONFZDDCHBrGYtJhGee8sJxXBij0uPGA5rG/i6jOc43UhGyFWYE7xQ/5AKuh9ddP4QgZJd6E5KQQWa0RAMl9CwJJo+tnwuzmIqWiHMmZEdG0LaQpeoz7StPbD3wLZuvgAO7/RzFKsPyhSAMUTawvkbvP14e0W5dsWcnClCKG13ua4kkeHzaANCInO9Vcnzzm/uKksIqSMj1lSa/nhVgzbUvDJQojTGtPs8cruj/8M+rQ5Hxcuf10aG8CLUarKLs8A3LY3+nz/eYTYoJMwTg99QzkI7gsugE3v2ks+utSEu0BkGioLaRQXGYdJ6DtkiuX6HrmnbiMRVtbnq/5gHcezGrktfR642DK3UZkQF7whkV4rw9910+adF4QAOFexyw0robqTgFTfFVEKSJ6xFu0g8MWXTn4nfPDMpeG+kel8YDObiSvy9LSbZ3vmuTAaClF0Tc8RooQkIZQ6CoIQTK4YRWNoDVSxziGGlUtYmpQzADPVBOFwxMxaGEsTCjzp8dhdg15zqCSfEyY7BtorKXtFZwFKXqsidxAW2ZSJE/IlipcMmKpngxfN/Oj2x5Tl/1B6g=" />

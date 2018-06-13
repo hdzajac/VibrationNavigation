@@ -72,7 +72,7 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
         }
         else {
             vibrationPattern = VibrationConstants.getVibrationPattern(position + 3);
-            vibrationPatternId = position + 2;
+            vibrationPatternId = position + 3;
         }
         Log.i(TAG, "selected vibrationPattern: " + parent.getItemAtPosition(position));
         Log.i(TAG, "selected vibrationPattern at position: " + (position));

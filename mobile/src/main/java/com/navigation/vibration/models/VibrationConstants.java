@@ -11,6 +11,7 @@ public class VibrationConstants {
     public static final byte LOW_PERIODIC_TAG= 4;
     public static final byte APPLE_LEFT_TAG= 5;
     public static final byte APPLE_RIGHT_TAG= 6;
+    public static final byte NONE_TAG= 7;
 
     //Position constants
     public static final byte LEFT = 1;
@@ -73,6 +74,8 @@ public class VibrationConstants {
             return APPLE_LEFT_TAG;
         else if (pattern == PredefinedPatterns.RIGHT_APPLE)
             return APPLE_RIGHT_TAG;
+        else if (pattern == PredefinedPatterns.NONE)
+            return NONE_TAG;
         return -1;
     }
 

@@ -699,16 +699,17 @@ public class MapFragmentView implements PositioningManager.OnPositionChangedList
         switch (position) {
             case VibrationConstants.AHEAD: //-1 means repeats once
                 tag = VibrationConstants.pickVibrationTag(chosenVibrationPattern.getPatternAhead());
+                Log.d(TAG, "vibration tag: " + tag);
                 msg[0] = tag;
 
                 if (noDevices == 1) {
-                    log_msg = "Sending to right vibration ahead";
-                    Log.v(TAG, log_msg);
+                    log_msg = "Sending to right vibration ahead "  + msg[0];
+                    Log.d(TAG, log_msg);
                     Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
                 } else {
                     log_msg = "Sending to both vibration ahead";
-                    Log.v(TAG, log_msg);
+                    Log.d(TAG, log_msg);
                     Toast.makeText(m_activity, log_msg, Toast.LENGTH_SHORT).show();
                     BluetoothService.getInstance().write(VibrationConstants.LEFT, msg);
                     BluetoothService.getInstance().write(VibrationConstants.RIGHT, msg);
