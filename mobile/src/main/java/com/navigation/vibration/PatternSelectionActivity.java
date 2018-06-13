@@ -17,6 +17,8 @@ import android.widget.Spinner;
 import com.navigation.vibration.models.VibrationConstants;
 import com.navigation.vibration.models.VibrationPattern;
 
+import java.util.Arrays;
+
 public class PatternSelectionActivity extends Activity implements AdapterView.OnItemSelectedListener {
 
     public static final String VIBRATION_POSITION = "chosen_vibration";
@@ -91,22 +93,31 @@ public class PatternSelectionActivity extends Activity implements AdapterView.On
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateTop(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternAhead(),-1));
+            vibrate(vibrationPattern.getPatternAhead());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateBottom(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternBack(),-1));
+        vibrate(vibrationPattern.getPatternBack());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateLeft(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternLeft(),-1));
+        vibrate(vibrationPattern.getPatternLeft());
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public void vibrateRight(View view) {
-        vibrator.vibrate(VibrationEffect.createWaveform(vibrationPattern.getPatternRight(),-1));
+        vibrate(vibrationPattern.getPatternRight());
+    }
+
+
+    public void vibrate(long [] vibration){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+            vibrator.vibrate(VibrationEffect.createWaveform(vibration,-1));
+        } else{
+            vibrator.vibrate(vibration, -1);
+        }
     }
 
 }

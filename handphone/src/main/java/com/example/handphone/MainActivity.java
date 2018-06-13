@@ -3,6 +3,7 @@ package com.example.handphone;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -194,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
                         vibrationID=readBuf[0];
                         Log.d(TAG,"VibrationID "+vibrationID);
 
-                        mVibrator.vibrate(VibrationConstants.getVibrationType(vibrationID), -1);
+                        vibrate(VibrationConstants.getVibrationType(vibrationID));
                         ( MainActivity.this).runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
@@ -225,4 +226,12 @@ public class MainActivity extends AppCompatActivity {
         }
     };
 
+
+    public void vibrate(long [] vibration){
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O){
+            mVibrator.vibrate(VibrationEffect.createWaveform(vibration,-1));
+        } else{
+            mVibrator.vibrate(vibration, -1);
+        }
+    }
 }
